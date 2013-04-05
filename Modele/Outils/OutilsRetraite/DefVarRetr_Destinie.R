@@ -68,7 +68,7 @@
 
 
 
-# Parametres generaux de la microsimulation--------
+# Parametres generaux de la microsimulation
 taille_max   <- 110000
 nb_enf_max   <- 6 
 age_max      <- 108
@@ -76,12 +76,11 @@ age_max      <- 108
 t_deb        <- 109
 t_fin        <- 160
 
-# Codes conjoint-----------
+# Codes conjoint
 celib     <- -1
 separ     <- -2
 veuf      <- -3
-
-# Codes statut-----------
+#Codes statut
 pas_ne    <- -1
 decede    <- -3
 inactif   <-  1
@@ -110,7 +109,7 @@ codes_occCN <- c(103:107)
 
 
 
-# Declaration variables micro ----------------
+# Declaration variables micro
 anaiss     <- numeric(taille_max)
 adeces     <- numeric(taille_max)
 age        <- numeric(taille_max)
@@ -140,13 +139,13 @@ PointFP        <- numeric(180)
 SMPT           <- numeric(180)
 PIB            <- numeric(180)
 
-# Chomage indemnisé:
+# Chomage indemnis?:
 salrefchom <- matrix (0     ,nrow=taille_max,ncol=t_fin     )
 chomind    <- matrix (0     ,nrow=taille_max,ncol=t_fin     )
 
 
 
-# Variables retraite individuelles principales----
+# Variables retraite individuelles principales
 pension_rg      <- numeric(taille_max)
 pension_ar      <- numeric(taille_max)
 pension_ag      <- numeric(taille_max)
@@ -172,7 +171,7 @@ indic_mc        <- numeric(taille_max)
 indic_mg        <- numeric(taille_max)
 dar             <- numeric(taille_max)
 
-# Variables retraite intermediaires-----------------
+# Variables retraite intermediaires (ajouts pour CN Ã  amÃ©liorer)
 duree_rg        <- 0
 duree_fp        <- 0
 duree_fpa       <- 0
@@ -183,6 +182,7 @@ duree_avpf      <- 0
 duree_cho       <- 0
 duree_PR        <- 0
 duree_emp       <- 0
+duree_empCN     <- 0
 duree_rg_maj    <- 0
 duree_in_maj    <- 0
 duree_tot_maj   <- 0
@@ -199,7 +199,7 @@ points_cn_ind   <- 0
 min_cont        <- 0
 min_garanti     <- 0
 
-# Paramètres de type serie temporelle ----------------------
+# Param??tres de type serie temporelle
 Prix            <- numeric(200)
 PlafondSS       <- numeric(200)
 SMIC            <- numeric(200)
@@ -277,7 +277,7 @@ RevaloCN        <- numeric(200)
 
 
 
-# Lecture des parametres simples---------
+# Lecture des parametres simples
 setwd((paste0(cheminsource,"Modele/Parametres/Destinie/Parametres Sociaux")))
 buf <- read.csv2("ParamEco.csv",dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
@@ -370,7 +370,7 @@ TauxCSGSal[t_min:t_max]      <- buf[1:nrow(buf),7]
 TauxCSGRet[t_min:t_max]      <- buf[1:nrow(buf),8]
 SeuilExoCSG[t_min:t_max]     <- buf[1:nrow(buf),9]
 
-# Parametres complexes geres par useleg---------
+# Parametres complexes geres par useleg
 AgeMinRG        <- 0
 AgeMinFP        <- 0
 AgeMinFPS       <- 0

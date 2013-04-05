@@ -1,4 +1,3 @@
-
 # 
 #                                   OutilsRetr : PROGRAMMES DE SIMULATION DES RETRAITES
 # 
@@ -88,19 +87,20 @@ DurBase <- function (i,t)
 
   
   # Durees par defaut, sans troncations
-  duree_cho  <<- Duree(i,1,t,chomeur)
-  duree_PR   <<- Duree(i,1,t,preret)
-  duree_emp  <<- Duree(i,1,t,c(non_cadre,cadre,fonct_a,fonct_s,indep))
-  duree_fpa  <<- Duree(i,1,t,fonct_a)
-  duree_fps  <<- Duree(i,1,t,fonct_s)
-  duree_in   <<- Duree(i,1,t,indep)
-  duree_avpf <<- Duree(i,1,t,avpf)
+  duree_cho   <<- Duree(i,1,t,c(chomeur,chomeurCN))
+  duree_PR    <<- Duree(i,1,t,preret)
+  duree_emp   <<- Duree(i,1,t,codes_occ)
+  duree_empCN <<- Duree(i,1,t,codes_occCN)  
+  duree_fpa   <<- Duree(i,1,t,fonct_a)
+  duree_fps   <<- Duree(i,1,t,fonct_s)
+  duree_in    <<- Duree(i,1,t,indep)
+  duree_avpf  <<- Duree(i,1,t,avpf)
   
   if (is.element("noassimil",Options))
   { duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre))}
   else 
   {
-  duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,preret))
+  duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,chomeurCN,preret))
   }
   
   if ((t>48) && (t<72)) {duree_rg <<- max(duree_rg,0.5*duree_rg+15)}
@@ -116,20 +116,20 @@ DurBase <- function (i,t)
 #   if ( ($duree_fp>0) &&  ($duree_fp<$DureeMinFP)  ) # Modif Marion 09/12/2011
 #   {
 #     print (" basculement ")    ;
-#     # affectation de la durée à la FP au RG
+#     # affectation de la dur?e ? la FP au RG
 #     $duree_rg    += $duree_fp;
 #     $duree_emprg += $duree_fp;
 #     $duree_fp     = 0;
 #     $duree_fpa    = 0;
 #     $duree_fps    = 0;
-#     # modification des statuts  (à corriger quand le Modele intégrera véritablement l'Ircantec)
+#     # modification des statuts  (? corriger quand le Modele int?grera v?ritablement l'Ircantec)
 #     #for (15..$age[$i]-1)
 #     #{
 #     # if ((In($statut_[$i][$_],@CodesFP)) && ($findet[$i]>21)) {$statut_[$i][$_]=$CodeCad};
 #     # if ((In($statut_[$i][$_],@CodesFP)) && ($findet[$i]<22)) {$statut_[$i][$_]=$CodeNC };
 #     #}
 #     
-#     # ATTENTION : modif Patrick 14/12/2011 : on ne modifie plus les statuts en cours de carrière (sinon Durbase ne peut plus être appelé qu'une fois par boucle ...)
+#     # ATTENTION : modif Patrick 14/12/2011 : on ne modifie plus les statuts en cours de carri?re (sinon Durbase ne peut plus ?tre appel? qu'une fois par boucle ...)
 #   }
 #   
   
@@ -146,9 +146,11 @@ if (duree_tot>0)
 }
   duree_fp  <<- duree_fpa+duree_fps
   duree_tot <<- duree_rg+duree_in+duree_fp
-  if ((LegDRA<2012) || (t< 112+10/12)) {   dureecotdra_tot<<- duree_emp                       }
-  else                              {   dureecotdra_tot<<- duree_emp+min(0.5,duree_cho)  }
-
+  if ((LegDRA<2012) || (t< 112+10/12)) {   dureecotdra_tot<<- duree_emp+duree_empCN}
+  else                              {   dureecotdra_tot<<- duree_emp+duree_empCN+min(0.5,duree_cho)  }
+  
+  # AJOUT POUR INCLUSION ANNEES PASSEES SOUS REGIME DES CN
+  duree_tot <<- duree_tot+duree_empCN
 }
 
 ############# Calcul des durees majorees selon avantages familiaux
@@ -193,6 +195,9 @@ DurMajo <- function(i,t)
     }
   }
   duree_tot_maj <<- duree_rg_maj+duree_fp_maj+duree_in_maj
+  
+#  # AJOUT POUR INCLUSION ANNEES PASSEES SOUS REGIME DES CN : Meme correction que dans DurBase
+  duree_tot_maj <<- duree_tot_maj+duree_empCN
 }
 
 #### Fonction SalBase
@@ -384,8 +389,8 @@ AgeMin <- function(i,t)
 agetest<-(t-anaiss[i])
 # Modification des AgeMinFP et AgeMinRG si conditions DRA remplies
   
-dar[i]<-0  #par defaut
-agedeb <- min(30, which(statut[i,] %in% c(cadre,non_cadre,indep,fonct_a,fonct_s))[1]-anaiss[i])
+dar[i]<<-0  #par defaut
+agedeb <- min(30, which(statut[i,] %in% c(codes_occ,codes_occCN))[1]-anaiss[i])
 
 # calcul des durees necessaires aux conditions
 DurBase(i,t)
@@ -405,9 +410,9 @@ if (          (agedeb<=DebActCibDRA[j])
              #  && (Arr(12*agetest) < Arr(12*Max(AgeMinRG,AgeMinFP))))
       {
     #    print (j)
-        dar[i]<- 1
-        AgeMinRG <- min(AgeMinRG,agetest)
-        AgeMinFP <- min(AgeMinFP,agetest)
+        dar[i]   <<- 1
+        AgeMinRG <<- min(AgeMinRG,agetest)
+        AgeMinFP <<- min(AgeMinFP,agetest)
       }
 
     }  # fin de la boucle sur j ("scenario" de depart anticipe)
@@ -484,11 +489,11 @@ Liq <- function(i,t)
 {
 #print ("liq")
   a <- AgeTrim(i,t)
-#  DurBase(i,t)   
-#  DurMajo(i,t)
+  DurBase(i,t)   
+  DurMajo(i,t)
   SalBase(i,t)
   Points(i,t)  
-  PointsCN (i,t)
+  PointsCN(i,t)
   MinCont(i,t)  
   MinGaranti(i,t)
 
@@ -746,11 +751,27 @@ SimDir <- function(i,t,comportement="TP",cible=c())
 {
 
 #  liq[i] <<- 0   #Remise ? 0 de l'indicatrice de liquidation (generee par liq)
-  if (AgeMin(i,t) && (statut[i,t]>0))   
+# DIVERSES CORRECTIONS Didier 20/3/2013 :
+# - AJOUT APPEL SUPPLEMENTAIRE DE DURBASE POUR QUE duree_tot SOIT BIEN RENSEIGNEE AVANT TEST (VOIR
+#   S'IL FAUDRA VRAIMENT GARDER CETTE CONDITION)
+# - Ajoute d'une CONDITION PAR UNE CONDITION SUR L'AGE SIMPLE SI ON EST EN COMPTES NOTIONNELS :mise 
+#   Ã  55 ans pour ratisser large
+  
+  DurBase(i,t)
+  if (tolower(comportement) == "exo")   # AJOUT CONTROLES SI CIBLE MAL DEFINIE
   {
-    if ( (ageliq[i]==0) & (duree_tot>0))     # Liquidation possible si l'individu n'a pas encore liquidé et a validé au moins une période. 
+    if (!(is.na(cible[i])) && cible[i]>0 && (t-anaiss[i])==cible[i])
+    {
+      AgeMin(i,t)    # On appelle quand mÃªme AgeMin pour activer modifs paramÃ¨tres si DRA
+      Liq(i,t)
+    }
+  }
+  else if (AgeMin(i,t) && (statut[i,t]>0))   
+  {
+    # Liquidation possible si l'individu n'a pas encore liquidÃ© et a validÃ© au moins une pÃ©riode.
+    # RAJOUT D'UNE CONDITION DE DUREE CN>0 POUR EVITER LIQUIDATIONS BIDONS D'INDIVIDUS SANS AUCUN DROITS
+    if (ageliq[i]==0 &&   (duree_tot>0 || (t>=AnneeDepartCN && duree_tot >0 && t-anaiss[i]>=55)))   ############   
     {  
-    
     if (AgeMax(i,t))
     {
       Liq(i,t)
@@ -762,18 +783,18 @@ SimDir <- function(i,t,comportement="TP",cible=c())
         Liq(i,t)
       }
     }
-    else if (tolower(comportement) == "exo")
-    {
-      if ((t-anaiss[i])==cible[i])
-      {
-        Liq(i,t)
-      }
-    }
-    else if (tolower(comportement) == "pmin")
+#     else if (tolower(comportement) == "exo")   # AJOUT CONTROLES SI CIBLE MAL DEFINIE
+#     {
+#       if (!(is.na(cible[i])) && cible[i]>0 && (t-anaiss[i])==cible[i])
+#       {
+#         Liq(i,t)
+#       }
+#     }
+    else if (tolower(comportement) == "pmin")  # IDEM
     {
       Clone(i,taille_max)
       Liq(taille_max,t)
-      if (pension[taille_max]>cible[i])
+      if (!(is.na(cible[i])) && cible[i]>0 && pension[taille_max]>cible[i])
       {
         Liq(i,t)
         delete(taille_max)
@@ -781,12 +802,12 @@ SimDir <- function(i,t,comportement="TP",cible=c())
     }
     else if (tolower(comportement)=="sw")
     {
-      # Cette option fait partir en retraite d??s que le niveau de vie en retraite est superieur
+      # Cette option fait partir en retraite dÃ¨s que le niveau de vie en retraite est superieur
       # au niveau de vie sans liquidation (ex: chomeur fin de droit) ou d??s qu'un taux de remplacement
       # minimum cible est atteint, sauf si le report apporte un gain de prestation superieur??? une valeur seuil beta.
       # Prendre une valeur de beta tres elevee revient un modele a simple cible de taux de remplacement
 #      print (c(i,cibletaux[i]))
-      nvprev   <- salaire[i,t-1]*(1-0.2)    #Salaire "net", avec un taux de cotisation moyen à 20%. 
+      nvprev   <- salaire[i,t-1]*(1-0.2)    #Salaire "net", avec un taux de cotisation moyen ? 20%. 
       nvnondep <- salaire[i,t]
       #$kinst = Max(Min(1,$k[0]),($k[0]*((1+$delta_k[0])**(Max(0,$agetest-60)))));
       kinst <- k[i]*((1+delta_k[i])^(max(0,(t-anaiss[i])-60)))

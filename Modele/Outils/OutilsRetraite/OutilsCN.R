@@ -6,10 +6,10 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsLeg.R")) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsRetr.R")) )
 
 ###### Fonction UseOptCN
-# Spécifie les options supplémentaires si option "CN" a été demandées avec UseOpt.
-# Il y a deux arguments. Le premier est le millésime de démarrage du basculement.
-# Le second est une chaine de caractère, avec les mêmes principes que dans UseOpt,
-# pouvant contenir les éléments suivants :
+# SpÃ©cifie les options supplÃ©mentaires si option "CN" a Ã©tÃ© demandÃ©es avec UseOpt.
+# Il y a deux arguments. Le premier est le millÃ©sime de dÃ©marrage du basculement.
+# Le second est une chaine de caract?re, avec les mÃªmes principes que dans UseOpt,
+# pouvant contenir les Ã©lÃ©ments suivants :
 
 # Exemples:
 #UseOptCN(2010,c("immediat", "rg"))
@@ -25,7 +25,7 @@ UseOptCN <- function(aCN,liste=c())
     OptionsCN[a] <<- tolower(liste[a])
   }
   
-  # Calcul de l'âge de démarrage du décompte des points
+  # Calcul de l'?ge de d?marrage du d?compte des points
   if (is.element("immediat",liste))    
   {
     t_debCN <<-1
@@ -40,11 +40,11 @@ UseOptCN <- function(aCN,liste=c())
 
 
 #####Fonction UseConv
-# Met a jour les coefficients de conversion si régime en comptes notionnels.
-# Il y a deux modes d'appel. Le premier mode doit-être utilisé lorsqu'on veut des
-# coefficients de conversion basés sur l'espérance de vie courante. 
-# Calcule les coefficients de conversion entre $agemin et $agemax égaux à 60 et 70
-# ans sur la base de la mortalité  de la date $t.
+# Met a jour les coefficients de conversion si r?gime en comptes notionnels.
+# Il y a deux modes d'appel. Le premier mode doit-?tre utilis? lorsqu'on veut des
+# coefficients de conversion bas?s sur l'esp?rance de vie courante. 
+# Calcule les coefficients de conversion entre $agemin et $agemax ?gaux ? 60 et 70
+# ans sur la base de la mortalit?  de la date $t.
 # Exemple : UseConv(60,70,$t);
 setwd((paste0(cheminsource,"Modele/Parametres/Demographie")))
        
@@ -59,10 +59,10 @@ quotient[2,,1:160] <- read_ap("QFnew.csv")
 
 UseConv <- function(agemin,agemax,t)
 {
-  if (t>=AnneeDepartCN)
+#  if (t>=AnneeDepartCN)   # Supprime : ne m'a pas semblÃ© utile
   {
-    # Coeffs d???finis par la mortalit??? (suppose que les coefficients de revalo
-    # prospectifs sont au moins d???finis jusqu'en 2050)
+    # Coeffs dÃ©finis par la mortalitÃ© (suppose que les coefficients de revalo
+    # prospectifs sont au moins dÃ©finis jusqu'en 2050)
     
     taux_croi <- RendementCNPrev[t]-(RevaloCN[t]-1)      #NB : Revalo et rendement pas dans la m???me unit??? !)
     for (a in (agemin:agemax))
@@ -89,36 +89,36 @@ UseConv <- function(agemin,agemax,t)
 
 
 ##### Fonction PointsCN
-# Calcule les points portés au compte individuel acquis par l'individu i à la date t.
+# Calcule les points portÃ©s au compte individuel acquis par l'individu i Ã  la date t.
 PointsCN <- function(i,t)
 {
   points_cn_pri  <<- 0
   points_cn_fp   <<- 0
   points_cn_ind  <<- 0
   
-  # Calcul des cumuls de points CN, selon étendue du nouveau régime
+  # Calcul des cumuls de points CN, selon Ã©tendue du nouveau rÃ©gime
   if (t>=AnneeDepartCN)
   {
     for (a in (30:t))   
     {
 
-      # Application du rendement aux cotisations portées au compte : A DISCUTER & 
-      points_cn_pri<<- points_cn_pri*(1+RendementCN[a-1])
-      points_cn_ind<<- points_cn_ind*(1+RendementCN[a-1])
-      points_cn_fp <<- points_cn_fp*(1+RendementCN[a-1])
+      # Application du rendement aux cotisations port?es au compte : A DISCUTER & 
+      points_cn_pri <<- points_cn_pri*(1+RendementCN[a-1])
+      points_cn_ind <<- points_cn_ind*(1+RendementCN[a-1])
+      points_cn_fp  <<- points_cn_fp*(1+RendementCN[a-1])
       
 
  if (statut[i,a]%in% c(cadreCN,non_cadreCN))
  {
- points_cn_pri <<-  points_cn_pri + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
+   points_cn_pri <<- points_cn_pri + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
  }
  else if (statut[i,a]%in% indepCN)
  {
- points_cn_ind <<-  points_cn_ind + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
+   points_cn_ind <<-points_cn_ind + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
  }
  else if (statut[i,a]%in% c(fonct_aCN,fonct_sCN))
  {
- points_cn_fp  <<- points_cn_fp +TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
+   points_cn_fp  <<- points_cn_fp + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
  }
       
   

@@ -270,4 +270,17 @@ read_ap <- function (fichier="",age="ligne")
   return (tab)
 }
 
+
+### Graphiques
+
+# Graph_compar (DB): comparaison de series temporelles
+graph_compar <- function (serie,t1,t2,titre)
+{
+  plot   (seq(1900+t1,1900+t2,by=1),serie[1,t1:t2],xlab="Annee", ylab=titre,
+          ylim=c(min(serie[,t1:t2],na.rm=TRUE),max(serie[,t1:t2],na.rm=TRUE)),lwd=2,col="orange",type="l")
+  points (seq(1900+t1,1900+t2,by=1),serie[2,t1:t2],lwd=3,type="l")
+  points (seq(1900+t1,1900+t2,by=1),serie[3,t1:t2],lwd=1,type="l")
+  points (seq(1900+t1,1900+t2,by=1),serie[4,t1:t2],lwd=2,type="l")
+}
+
  

@@ -16,26 +16,17 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsRetr.R")) )
 
 
 
-UseOptCN <- function(aCN,liste=c())
-{    
-  AnneeDepartCN <<-aCN 
-  OptionsCN     <<- c()
-  for (a in 1:length(liste))
+UseOptCN <- function(liste=c())
+{
+  OptionsCN <<- c()
+  for (i in 1:length(liste))
   {
-    OptionsCN[a] <<- tolower(liste[a])
+    OptionsCN[i] <<- tolower(liste[i])
+    if (!(is.element(OptionsCN[i],c("valocot")))) 
+    {
+      print (paste("Attention : option '",OptionsCN[i],"' inconnue"))
+    }
   }
-  
-  # Calcul de l'?ge de d?marrage du d?compte des points
-  if (is.element("immediat",liste))    
-  {
-    t_debCN <<-1
-  }
-  else if (is.element("progressif",liste))  
-  {
-    t_debCN<<-(AnneeDepartCN)
-  }
-
-  
 }
 
 
@@ -71,9 +62,9 @@ UseConv <- function(agemin,agemax,t)
       
       for (u in (a:120))
       {
-        CoeffConv[a] <<- CoeffConv[a] + ((1+taux_croi)**(-u+a))*(survie[1,u,t]+survie[2,u,t])
-        
+        CoeffConv[a] <<- CoeffConv[a] + ((1+taux_croi)**(-u+a))*(survie[1,u,t]+survie[2,u,t])        
       }
+
       
       CoeffConv[a] <<- (survie[1,40,t]+survie[2,40,t])/CoeffConv[a]
       #print (c(a,CoeffConv[a]))
@@ -90,38 +81,47 @@ UseConv <- function(agemin,agemax,t)
 
 ##### Fonction PointsCN
 # Calcule les points portés au compte individuel acquis par l'individu i à la date t.
-PointsCN <- function(i,t)
+PointsCN <- function(i,t,plafond)
 {
+
   points_cn_pri  <<- 0
   points_cn_fp   <<- 0
   points_cn_ind  <<- 0
-  
   # Calcul des cumuls de points CN, selon étendue du nouveau régime
   if (t>=AnneeDepartCN)
   {
     for (a in (30:t))   
     {
-
-      # Application du rendement aux cotisations port?es au compte : A DISCUTER & 
+ #     print(c("a",a,points_cn_pri ))
+      # Application du rendement aux cotisations portees au compte : A DISCUTER & 
       points_cn_pri <<- points_cn_pri*(1+RendementCN[a-1])
       points_cn_ind <<- points_cn_ind*(1+RendementCN[a-1])
-      points_cn_fp  <<- points_cn_fp*(1+RendementCN[a-1])
+      points_cn_fp  <<- points_cn_fp* (1+RendementCN[a-1])
+      
+  if (is.element("valocot",OptionsCN))
+  {
+  if (a < AnneeDepartCN) {points_cn_pri <<- points_cn_pri + CotRetSalAnn(i,a)}
+  if (a == AnneeDepartCN) {statut[i,1:(AnneeDepartCN-1)]<<-0}
+  # ajouté au point privé par défault (décomposition par régime nécessaire?)
+  }
+
       
 
  if (statut[i,a]%in% c(cadreCN,non_cadreCN))
  {
-   points_cn_pri <<- points_cn_pri + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
+   points_cn_pri <<- points_cn_pri + TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
+ # print(c(plafond,min(salaire[i,a],plafond*PlafondSS[a])))
  }
  else if (statut[i,a]%in% indepCN)
  {
-   points_cn_ind <<-points_cn_ind + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
+   points_cn_ind<<-points_cn_ind + TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
  }
  else if (statut[i,a]%in% c(fonct_aCN,fonct_sCN))
  {
-   points_cn_fp  <<- points_cn_fp + TauxCotCN[a]*min(salaire[i,a],8*PlafondSS[a])
+   points_cn_fp  <<- points_cn_fp+ TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
  }
+
       
-  
     }  # Fin boucle sur a
  #   print(c(points_cn_pri,points_cn_ind,points_cn_fp))  
   }

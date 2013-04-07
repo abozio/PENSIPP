@@ -63,7 +63,7 @@
 # de tabulation complementaires aux procedures standard de OutilsMS, telles
 # que des moyennes par age et par generation. Ces procedures sont definies dans cette
 # bibliotheque plutot que dans OutilsBase  car elles supposent la predeclaration
-# des variables age et anaiss qui sont inconnues de OutilsBase.
+# des variables age et t_naiss qui sont inconnues de OutilsBase.
 
 
 
@@ -110,12 +110,14 @@ codes_occCN <- c(103:107)
 
 
 # Declaration variables micro
-anaiss     <- numeric(taille_max)
-adeces     <- numeric(taille_max)
+t_naiss    <- numeric(taille_max)
+t_naiss[]  <- 999
+t_deces    <- numeric(taille_max)
+t_deces[]  <- 999
 age        <- numeric(taille_max)
 sexe       <- numeric(taille_max)
 findet     <- numeric(taille_max)
-taux_prime <- numeric(taille_max)
+tauxprime  <- numeric(taille_max)
 pere       <- numeric(taille_max)
 mere       <- numeric(taille_max)
 n_enf      <- numeric(taille_max)
@@ -155,6 +157,8 @@ pension_cn_pri  <- numeric(taille_max)
 pension_cn_fp   <- numeric(taille_max)
 pension_cn_ind  <- numeric(taille_max)
 pension         <- numeric(taille_max)
+cotret          <- numeric(taille_max)
+cotrettot       <- numeric(taille_max)
 rev_rg          <- numeric(taille_max)
 rev_ar          <- numeric(taille_max)
 rev_ag          <- numeric(taille_max)
@@ -165,7 +169,8 @@ rev_cn_fp       <- numeric(taille_max)
 rev             <- numeric(taille_max)
 ageliq          <- numeric(taille_max)
 pliq            <- numeric(taille_max)
-liq             <- numeric(taille_max)
+t_liq           <- numeric(taille_max)
+t_liq[]         <- 999
 min_vieil       <- numeric(taille_max)
 indic_mc        <- numeric(taille_max)
 indic_mg        <- numeric(taille_max)
@@ -196,8 +201,10 @@ points_agirc    <- 0
 points_cn_pri   <- 0
 points_cn_fp    <- 0
 points_cn_ind   <- 0
+plafond         <- 0
 min_cont        <- 0
 min_garanti     <- 0
+
 
 # Param??tres de type serie temporelle
 Prix            <- numeric(200)
@@ -415,8 +422,8 @@ CibleLiq        <- 0
 
 Clone <- function(i,j)
 {
-  anaiss[j]          <<- anaiss[i]
-  adeces[j]          <<- adeces[i]
+  t_naiss[j]         <<- t_naiss[i]
+  t_deces[j]         <<- t_deces[i]
   age[j]             <<- age[i]
   sexe[j]            <<- sexe[i]
   findet[j]          <<- findet[i]
@@ -433,8 +440,8 @@ Clone <- function(i,j)
 
 Delete <- function(i)
 {
-  anaiss[i]          <<- 0
-  adeces[i]          <<- 0
+  t_naiss[i]          <<- 0
+  t_deces[i]          <<- 0
   age[i]             <<- 0
   sexe[i]            <<- 0
   findet[i]          <<- 0

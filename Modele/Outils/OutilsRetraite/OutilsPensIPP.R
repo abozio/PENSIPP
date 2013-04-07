@@ -1,36 +1,35 @@
 #####################################################################################################
-#                         Bibliothèque d'utilitaires généraux à PENSIPP
+#                         Bibliotheque d'utilitaires generaux PENSIPP
 # 
 # 
-# Cette bibliothèque contient:
-# B) des fonctions calculant diverses probabilités d'évènements démographiques
+# Cette bibliotheque contient
+# B) des fonctions calculant diverses probabilites d'evenements demographiques
 # C) des procedures de gestion des liens familiaux
 # D) des procedures de tabulation
-# E) des fonctions d'entrée-sortie
+# E) des fonctions d'entree-sortie'
 #
 # Quelques conventions :
-# - R démarrant l'indiçage des tableaux par 1, l'âge est également compté à partir de 1. Autrement dit,
-#   si on se situe au 1/1 d'une année donnée, il s'agira de l'âge atteint dans l'année.
-# - Toutes les dates sont comptées par rapport à l'année 1900, par exemple annais[i]=90 pour un 
-#   individu né en 1990, statut[i,110] pour son statut en 2010. De même, pour les séries temporelles,
-#   x[107] correspond à une valeur de l'année 2007 et la première position utilisable est donc l'année 
+# - R demarrant l'indiÃ§age des tableaux par 1, l'age est egalement compte a partir de 1. Autrement dit,
+#   si on se situe au 1/1 d'une annee donnee, il s'agira de l'age atteint dans l'annee.
+# - Toutes les dates sont comptees par rapport a l'annee 1900, par exemple annais[i]=90 pour un 
+#   individu ne en 1990, statut[i,110] pour son statut en 2010. De m??me, pour les series temporelles,
+#   x[107] correspond a une valeur de l'annee 2007 et la premiere position utilisable est donc l'annee 
 #   1901
-# - Lorsqu'un apparenté n'est pas défini, son ID est à zero
+# - Lorsqu'un apparente n'est pas defini, son ID est a zero
 # - Codes particuliers 
 #   conjoint : -3=veuf, -2=separe, -1=celibataire, >0=id du conjoint
-#   statut   : -2=non vivant, -1=vivant hors territoire, >0=statuts d'activité des présents
-#
+#   statut   : -2=non vivant, -1=vivant hors territoire, >0=statuts d'activite des presents
+
 ######################################################################################################
 
 
-
-# A. Fonctions de probabilité d'évènements démographiques -----------------
-##########################################################
+########################################################################################
+#A ) PROBA D'EVENEMENTS DEMOGRAPHIQUES
 
 proba_union <- function(i,t)
-# Coefficients d'aprÃ¨s DuÃ©e (2006)
+# Coefficients d'apres Duee (2006)
 {
-  # On calcule l'age courant et la durÃ©e depuis la sÃ©paration (s'il y a lieu)
+  # On calcule l'age courant et la duree depuis la separation (s'il y a lieu)
   a     <- age[i]
 #  d     <- t-max(which(conjoint[i,]>0))
   d <- 0
@@ -65,11 +64,11 @@ proba_union <- function(i,t)
 }
 
 proba_separ <- function(i,t)
-# Les probas sont appliquÃ©es Ã  la femme
+# Les probas sont appliquees a la femme
 {
   if (statut[i,t]>0 && sexe[i]==2 && conjoint[i,t]>0)
   {
-    # age Ã  l'union, duree Ã©coulÃ©e et nombre d'enfants de l'union en cours
+    # age a l'union, duree ecoulee et nombre d'enfants de l'union en cours
     a <- min(which(conjoint[i,]==conjoint[i,t]))-anaiss[i]
     d <- age[i]-a
     n_union <- length(intersect(liste_enf(i,t),liste_enf(conjoint[i,t],t)))
@@ -88,7 +87,7 @@ proba_separ <- function(i,t)
 
 proba_naissance <- function(i,t)
   # A ce stade, fonction se contentant de controler le fait d'etre une femme en couple et 
-  # le fait d'avoir un nombre d'enfants inf??©rieur au nombre maximum g??©r??© par le programme. 
+  # le fait d'avoir un nombre d'enfants inf???rieur au nombre maximum g???r??? par le programme. 
 {
   p <- 0
   if (statut[i,t]>0)
@@ -105,11 +104,10 @@ proba_naissance <- function(i,t)
   return (p)
 }
 
+#######################################################################################################
+# B) FONCTIONS DE GESTION DES LIENS FAMILIAUX
 
-# B. Fonctions de gestion des liens familiaux --------------------------------
-##############################################
-
-# -> liste_enf : retourne la liste des id des enfants de l'individu i : par dÃ©faut l'ensemble
+# -> liste_enf : retourne la liste des id des enfants de l'individu i : par defaut l'ensemble
 #                des ces enfants, ou seulement les enfants encore en vie (option="vivants")
 liste_enf  <- function(i,t,option="tous")
 {
@@ -129,7 +127,7 @@ liste_enf  <- function(i,t,option="tous")
   return (liste)
 }
 
-# -> nb_enf : retourne le nombre d'enfants de l'individu i : par dÃ©faut l'ensemble
+# -> nb_enf : retourne le nombre d'enfants de l'individu i : par defaut l'ensemble
 #             des ces enfants, ou seulement les enfants encore en vie (option="vivants")
 nb_enf <- function(i,t,option="tous")
 {
@@ -150,16 +148,14 @@ nb_enf <- function(i,t,option="tous")
   return (nb_enf)
 }
 
-
-# C. Fonctions de tabulation ----------------------------------------------
-##############################
-
+#######################################################################################################
+# FONCTION DE TABULATION SUR VARIABLES DESTINIE
 
 # -> Fonction "pyram"
 #
-# Retourne des efffectifs par age, avec filtrage optionnel. Le second paramÃ¨tre, Ã©galement optionnel, est le 
-# pas de la pyramide, par exemple pas=5 pour un regroupement quinquennal. Par dÃ©faut, le pas est Ã©gal 
-# est Ã©gal Ã  1
+# Retourne des efffectifs par age, avec filtrage optionnel. Le second parametre, egalement optionnel, est le 
+# pas de la pyramide, par exemple pas=5 pour un regroupement quinquennal. Par defaut, le pas est egal 
+# est egal a 1
 # 
 # Exemple d'utilisations
 #  pyramide[,t]    <- pyram(t)
@@ -179,9 +175,9 @@ pyram <- function(filtre=rep(TRUE,taille_max),pas=1)
 }
 
 # -> function "by_age"
-# Calcul de diffÃ©rentes statistiques descriptives univariÃ©es pour une variable donnÃ©e, ventilÃ©es
-# par age avec un pas ajustable (pas=1 par dÃ©faut) et filtrage Ã©ventuel. Par dÃ©faut, la statisti-
-# que calculÃ©e est la moyenne (type="mean"). Les autres options possibles sont "min, "max", "median" 
+# Calcul de differentes statistiques descriptives univariees pour une variable donnee, ventilees
+# par age avec un pas ajustable (pas=1 par defaut) et filtrage eventuel. Par defaut, la statisti-
+# que calculee est la moyenne (type="mean"). Les autres options possibles sont "min, "max", "median" 
 # et "sd".
 #
 # Exemples d'appel
@@ -228,12 +224,11 @@ by_age <- function(var,t,filtre=rep(TRUE,taille_max),type="mean",pas=1)
   
 # -> Fonction read_ap
 #
-# Lecture d'un tableau de données par age et periode dans le fichier dont le nom est passé en premier
-# argument. Le résultat est sous forme de matrice dont le premier indice est la période et le second
-# est l'age, e.g. quotient_mortalite[t,a]. La même fonction peut évidemment servir à lire un tableau 
-# par génération et age, à charge pour l'utilisateur de l'utiliser ensuite de manière adéquate. Un 
-# second paramètre permet de spécifier si l'age se lit en ligne ou en colonne dans le fichier d'origine
-
+# Lecture d'un tableau de donn?es par age et periode dans le fichier dont le nom est pass? en premier
+# argument. Le r?sultat est sous forme de matrice dont le premier indice est la p?riode et le second
+# est l'age, e.g. quotient_mortalite[t,a]. La m?me fonction peut ?videmment servir ? lire un tableau 
+# par g?n?ration et age, ?? charge pour l'utilisateur de l'utiliser ensuite de mani?re ad?quate. Un 
+# second param?tre permet de sp?cifier si l'age se lit en ligne ou en colonne dans le fichier d'origine
 read_ap <- function (fichier="",age="ligne")
 {  
   buf <- read.table(fichier,sep=";")

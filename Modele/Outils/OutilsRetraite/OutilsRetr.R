@@ -32,7 +32,8 @@
 #
 # V. Calcul d'indicateurs derives
 #
-#    CotRet      : calcule les cotisations retraite sur salaires
+#    CotRet      : calcule les cotisations retraite sur salaires sur une année
+#    CotRetTot   : calcule l'ensemble des cotisation retraite sur salaire versées 
 
 
 
@@ -75,7 +76,7 @@ Duree <- function(i,t1,t2,valeurs)
 ############ DurBase
 DurBase <- function (i,t)
 {
-
+  
   # Reversement prealable des annees FP au RG si dureeFP < minimum
   if (Duree(i,1,t,c(fonct_a,fonct_s))<DureeMinFP)
   {
@@ -84,7 +85,7 @@ DurBase <- function (i,t)
     else              {statut[i,annees_fp] <<- non_cadre}
   }
   
-
+  
   
   # Durees par defaut, sans troncations
   duree_cho   <<- Duree(i,1,t,c(chomeur,chomeurCN))
@@ -100,50 +101,50 @@ DurBase <- function (i,t)
   { duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre))}
   else 
   {
-  duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,chomeurCN,preret))
+    duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,chomeurCN,preret))
   }
   
   if ((t>48) && (t<72)) {duree_rg <<- max(duree_rg,0.5*duree_rg+15)}
   
-#   # Reversement  des annees FP au RG si dureeFP < minimum
-#   if (Duree(i,1,t-1,c(fonct_a,fonct_s))<DureeMinFP)
-#   {
-#     annees_fp <- which(is.element(statut[i,1:t],c(fonct_a,fonct_s)))
-#     if (findet[i]>22) {statut[i,annees_fp] <<- cadre}
-#     else              {statut[i,annees_fp] <<- non_cadre}
-#   }
-#  
-#   if ( ($duree_fp>0) &&  ($duree_fp<$DureeMinFP)  ) # Modif Marion 09/12/2011
-#   {
-#     print (" basculement ")    ;
-#     # affectation de la dur?e ? la FP au RG
-#     $duree_rg    += $duree_fp;
-#     $duree_emprg += $duree_fp;
-#     $duree_fp     = 0;
-#     $duree_fpa    = 0;
-#     $duree_fps    = 0;
-#     # modification des statuts  (? corriger quand le Modele int?grera v?ritablement l'Ircantec)
-#     #for (15..$age[$i]-1)
-#     #{
-#     # if ((In($statut_[$i][$_],@CodesFP)) && ($findet[$i]>21)) {$statut_[$i][$_]=$CodeCad};
-#     # if ((In($statut_[$i][$_],@CodesFP)) && ($findet[$i]<22)) {$statut_[$i][$_]=$CodeNC };
-#     #}
-#     
-#     # ATTENTION : modif Patrick 14/12/2011 : on ne modifie plus les statuts en cours de carri?re (sinon Durbase ne peut plus ?tre appel? qu'une fois par boucle ...)
-#   }
-#   
+  #   # Reversement  des annees FP au RG si dureeFP < minimum
+  #   if (Duree(i,1,t-1,c(fonct_a,fonct_s))<DureeMinFP)
+  #   {
+  #     annees_fp <- which(is.element(statut[i,1:t],c(fonct_a,fonct_s)))
+  #     if (findet[i]>22) {statut[i,annees_fp] <<- cadre}
+  #     else              {statut[i,annees_fp] <<- non_cadre}
+  #   }
+  #  
+  #   if ( (duree_fp>0) &&  (duree_fp<DureeMinFP)  ) # Modif Marion 09/12/2011
+  #   {
+  #     print (" basculement ")    ;
+  #     # affectation de la dur?e ? la FP au RG
+  #     duree_rg    += duree_fp;
+  #     duree_emprg += duree_fp;
+  #     duree_fp     = 0;
+  #     duree_fpa    = 0;
+  #     duree_fps    = 0;
+  #     # modification des statuts  (? corriger quand le Modele int?grera v?ritablement l'Ircantec)
+  #     #for (15..age[i]-1)
+  #     #{
+  #     # if ((In(statut_[i][_],@CodesFP)) && (findet[i]>21)) {statut_[i][_]=CodeCad};
+  #     # if ((In(statut_[i][_],@CodesFP)) && (findet[i]<22)) {statut_[i][_]=CodeNC };
+  #     #}
+  #     
+  #     # ATTENTION : modif Patrick 14/12/2011 : on ne modifie plus les statuts en cours de carri?re (sinon Durbase ne peut plus ?tre appel? qu'une fois par boucle ...)
+  #   }
+  #   
   
   
-#  Pour finir, on ventile le surcroit de duree d'activite entre les quatres types de durees de cotisation, 
-#  au prorata de leurs parts non redressees
+  #  Pour finir, on ventile le surcroit de duree d'activite entre les quatres types de durees de cotisation, 
+  #  au prorata de leurs parts non redressees
   duree_tot <<- duree_rg+duree_in+duree_fpa+duree_fps
-if (duree_tot>0)
-{
-  duree_rg  <<- duree_rg*(1+trim_act[i]/duree_tot)
-  duree_in  <<- duree_in*(1+trim_act[i]/duree_tot)
-  duree_fpa <<- duree_fpa*(1+trim_act[i]/duree_tot)
-  duree_fps <<- duree_fps*(1+trim_act[i]/duree_tot)
-}
+  if (duree_tot>0)
+  {
+    duree_rg  <<- duree_rg*(1+trim_act[i]/duree_tot)
+    duree_in  <<- duree_in*(1+trim_act[i]/duree_tot)
+    duree_fpa <<- duree_fpa*(1+trim_act[i]/duree_tot)
+    duree_fps <<- duree_fps*(1+trim_act[i]/duree_tot)
+  }
   duree_fp  <<- duree_fpa+duree_fps
   duree_tot <<- duree_rg+duree_in+duree_fp
   if ((LegDRA<2012) || (t< 112+10/12)) {   dureecotdra_tot<<- duree_emp+duree_empCN}
@@ -177,10 +178,10 @@ DurMajo <- function(i,t)
     {
        if (n_enf[i]>0)
        {
-       if (is.element(statut[i,anaiss[enf[i,e]]],c(fonct_a,fonct_s)) )
+       if (is.element(statut[i,t_naiss[enf[i,e]]],c(fonct_a,fonct_s)) )
         {
-        if      (anaiss[enf[i,e]]<=104)  {nenfFP1 <- nenfFP1+1}
-        else if (anaiss[enf[i,e]]> 104)  {nenfFP2 <- nenfFP2+1}
+        if      (t_naiss[enf[i,e]]<=104)  {nenfFP1 <- nenfFP1+1}
+        else if (t_naiss[enf[i,e]]> 104)  {nenfFP2 <- nenfFP2+1}
         }
        }
     }
@@ -209,7 +210,7 @@ SalBase <- function(i,t)
   spc      <- numeric(t_fin)
   revalcum <- 1
   u        <- t
-  while (u > anaiss[i]+15)
+  while (u > t_naiss[i]+15)
   {    
      spc[u]      <- revalcum*min(PlafondSS[u],salaire[i,u])
      if  ( (statut[i,u]==avpf) && (!(is.element("noavpf",Options))) )
@@ -366,19 +367,19 @@ MinGaranti <- function(i,t)
 ############# AGETRIM
 AgeTrim <- function(i,t)
 {
-  return (t-anaiss[i]+trim_naiss[i])
+  return (t-t_naiss[i]+trim_naiss[i])
 }
 
 # ############ AGEMIN VERSION SANS DRA, A REPRENDRE
 # AgeMin <- function(i,t)
 # {  
-#   if      ((Duree(i,1,t-1,fonct_a)>14) && ((t-anaiss[i])>=AgeMinFPA))   {return (TRUE)}
-#   else if ((Duree(i,1,t-1,fonct_s)> 0) && ((t-anaiss[i])>=AgeMinFPS))   {return (TRUE)}
-#   else if (                   ((t-anaiss[i])>=AgeMinRG )           )    {return (TRUE)}
+#   if      ((Duree(i,1,t-1,fonct_a)>14) && ((t-t_naiss[i])>=AgeMinFPA))   {return (TRUE)}
+#   else if ((Duree(i,1,t-1,fonct_s)> 0) && ((t-t_naiss[i])>=AgeMinFPS))   {return (TRUE)}
+#   else if (                   ((t-t_naiss[i])>=AgeMinRG )           )    {return (TRUE)}
 #   else                                                                  {return (FALSE)}
 # 
 # #CN
-#   if (t>AnneeDepartCN) {if (t-anaiss[i]>=60) {return (TRUE)} else {return (FALSE)}}  
+#   if (t>AnneeDepartCN) {if (t-t_naiss[i]>=60) {return (TRUE)} else {return (FALSE)}}  
 # }
 
 # ########### AGEMIN VERSION AVEC DRA
@@ -386,11 +387,11 @@ AgeTrim <- function(i,t)
 AgeMin <- function(i,t)  
 {
 #print(c("agemin", t))
-agetest<-(t-anaiss[i])
+agetest<-(t-t_naiss[i])
 # Modification des AgeMinFP et AgeMinRG si conditions DRA remplies
   
 dar[i]<<-0  #par defaut
-agedeb <- min(30, which(statut[i,] %in% c(codes_occ,codes_occCN))[1]-anaiss[i])
+agedeb <- min(30, which(statut[i,] %in% c(codes_occ,codes_occCN))[1]-t_naiss[i])
 
 # calcul des durees necessaires aux conditions
 DurBase(i,t)
@@ -436,15 +437,15 @@ AgeAnnDecRG<<-AgeMinRG
 # Version sans difference polypensionne. Voir version D2. 
 AgeMax <- function(i,t)
 {  
-  if  ((statut[i,t]%in% fonct_a) && (duree_fpa>=15) && (t-anaiss[i]>=AgeMaxFP))  { return (TRUE)}     #A REPRENDRE 15 : duree min FPA
-  else if (  (statut[i,t]%in% fonct_a)              && (t-anaiss[i]>=AgeMaxFP)    )       { return (TRUE)}
-  else if (  (statut[i,t]%in% c(fonct_a,fonct_s))   && (t-anaiss[i]>=AgeMaxFP)    )       { return (TRUE)}
-  else if (  (statut[i,t]%in% c(cadre,non_cadre))   && (t-anaiss[i]>=AgeMaxRG)    )       { return (TRUE)}
-  else if (  (t-anaiss[i]>=70)    )                                                       { return (TRUE)}
+  if  ((statut[i,t]%in% fonct_a) && (duree_fpa>=15) && (t-t_naiss[i]>=AgeMaxFP))  { return (TRUE)}     #A REPRENDRE 15 : duree min FPA
+  else if (  (statut[i,t]%in% fonct_a)              && (t-t_naiss[i]>=AgeMaxFP)    )       { return (TRUE)}
+  else if (  (statut[i,t]%in% c(fonct_a,fonct_s))   && (t-t_naiss[i]>=AgeMaxFP)    )       { return (TRUE)}
+  else if (  (statut[i,t]%in% c(cadre,non_cadre))   && (t-t_naiss[i]>=AgeMaxRG)    )       { return (TRUE)}
+  else if (  (t-t_naiss[i]>=70)    )                                                       { return (TRUE)}
   else                                                                                    { return (FALSE)}
   
   #CN
-  if (t>AnneeDepartCN) {if (t-anaiss[i]>=70) {return (TRUE)} else {return (FALSE)}}
+  if (t>AnneeDepartCN) {if (t-t_naiss[i]>=70) {return (TRUE)} else {return (FALSE)}}
 }
 
 
@@ -489,11 +490,11 @@ Liq <- function(i,t)
 {
 #print ("liq")
   a <- AgeTrim(i,t)
+  PointsCN(i,t,plafond)
   DurBase(i,t)   
   DurMajo(i,t)
   SalBase(i,t)
   Points(i,t)  
-  PointsCN(i,t)
   MinCont(i,t)  
   MinGaranti(i,t)
 
@@ -551,7 +552,7 @@ Liq <- function(i,t)
 # print (prorat)
 
   # Prise en compte optionnelle du minimum contributif
-  if (!(is.element("NoMC",Options)) && (distance>=0) && (pension_rg[i]>0))
+  if (!(is.element("nomc",Options)) && (distance>=0) && (pension_rg[i]>0))
   {
     if (TauxPlein(i,t))
     {
@@ -563,7 +564,7 @@ Liq <- function(i,t)
     }
   }  
   # Prise en compte optionnelle de la Bonif pour 3 enfants et plus (10% )
-  if (!(is.element("NoBonif",Options)) && (n_enf[i]>=3)) {pension_rg[i] <<- pension_rg[i]*1.1}
+  if (!(is.element("nobonif",Options)) && (n_enf[i]>=3)) {pension_rg[i] <<- pension_rg[i]*1.1}
   
   
   ######### Sous module ARRCO/AGIRC ###########################################
@@ -588,7 +589,7 @@ Liq <- function(i,t)
   # Apr?s 2012: pension ARRCO , 10% ; pension AGIRC , 10% (alignement RG)
 
 
-  if (!(is.element("NoBonif",Options)) &&  (n_enf[i]>=3))
+  if (!(is.element("nobonif",Options)) &&  (n_enf[i]>=3))
   {
      if (Leg <= 2011)
      {  
@@ -622,7 +623,7 @@ Liq <- function(i,t)
     
   {
     taux <-  0.75*
-      (1.0-DecoteFP *max(0,min(AgeAnnDecFP-(t-anaiss[i]),DureeCibFP-duree_tot_maj))+
+      (1.0-DecoteFP *max(0,min(AgeAnnDecFP-(t-t_naiss[i]),DureeCibFP-duree_tot_maj))+
        SurcoteFP*max(0,min(a-AgeMinFPS,duree_tot_maj-DureeCibFP)))
   }
   
@@ -639,7 +640,7 @@ Liq <- function(i,t)
   # Application du minimum garanti
   # pour l'instant la valeur du point d'indice est bidon
   # le resultat est donc faux, mais le calcul fonctionne
-  if (!(is.element("NoMG",Options)) && (pension_fp[i]==0))
+  if (!(is.element("nomg",Options)) && (pension_fp[i]==0))
   {
     pension_fp[i]    <<- max(pension_fp[i],min_garanti)
     if (pension_fp[i] <= min_garanti) {indic_mg[i] <<- 1}
@@ -649,7 +650,7 @@ Liq <- function(i,t)
   # 10%  + 5% par enfant de rang sup ??? 4 (
   # Limitation de la pension si la retraite apr??s bonif depasse le
   # salaire de reference
-  if (!(is.element("NoBonif",Options)) && (n_enf[i]>=3))
+  if (!(is.element("nobonif",Options)) && (n_enf[i]>=3))
   {
     pension_fp[i]  <<-  min(pension_fp[i]*(1.1+0.05*(n_enf[i]-3)),sr_fp)
   }
@@ -672,16 +673,16 @@ Liq <- function(i,t)
     taux*prorat*sam_in)
   
   # Prise en compte optionnelle de la Bonif pour 3 enfants et plus  (10% )
-  if (!(is.element("NoBonif",Options)) && (n_enf[i]>=3)) {pension_in[i] <<- pension_in[i]*1.1}
+  if (!(is.element("nobonif",Options)) && (n_enf[i]>=3)) {pension_in[i] <<- pension_in[i]*1.1}
   
   ########### Sous module compte notionel ###############################
    if (t>=AnneeDepartCN)
    {  
   
-  pension_cn_pri[i] <<-CoeffConv[t-anaiss[i]]*points_cn_pri
-#  print (c(pension_cn_pri[i],CoeffConv[t-anaiss[i]],points_cn_pri))
-  pension_cn_fp[i]  <<-CoeffConv[t-anaiss[i]]*points_cn_fp
-  pension_cn_ind[i] <<-CoeffConv[t-anaiss[i]]*points_cn_ind
+  pension_cn_pri[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_pri
+#  print (c(pension_cn_pri[i],CoeffConv[t-t_naiss[i]],points_cn_pri))
+  pension_cn_fp[i]  <<-CoeffConv[t-t_naiss[i]]*points_cn_fp
+  pension_cn_ind[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_ind
    }
   
   ######### Mises a jour finales ##############################################
@@ -690,8 +691,8 @@ Liq <- function(i,t)
                              pension_fp[i]+pension_in[i]+
                              pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]
   pliq[i]                <<- pension[i]
-  ageliq[i]              <<- t-anaiss[i]
-  liq[i]                 <<- t
+  ageliq[i]              <<- t-t_naiss[i]
+  t_liq[i]                 <<- t
   
   
   
@@ -750,7 +751,6 @@ Revalo <- function(i,t1,t2)
 SimDir <- function(i,t,comportement="TP",cible=c())
 {
 
-#  liq[i] <<- 0   #Remise ? 0 de l'indicatrice de liquidation (generee par liq)
 # DIVERSES CORRECTIONS Didier 20/3/2013 :
 # - AJOUT APPEL SUPPLEMENTAIRE DE DURBASE POUR QUE duree_tot SOIT BIEN RENSEIGNEE AVANT TEST (VOIR
 #   S'IL FAUDRA VRAIMENT GARDER CETTE CONDITION)
@@ -760,7 +760,7 @@ SimDir <- function(i,t,comportement="TP",cible=c())
   DurBase(i,t)
   if (tolower(comportement) == "exo")   # AJOUT CONTROLES SI CIBLE MAL DEFINIE
   {
-    if (!(is.na(cible[i])) && cible[i]>0 && (t-anaiss[i])==cible[i])
+    if (!(is.na(cible[i])) && cible[i]>0 && (t-t_naiss[i])==cible[i])
     {
       AgeMin(i,t)    # On appelle quand même AgeMin pour activer modifs paramètres si DRA
       Liq(i,t)
@@ -770,7 +770,7 @@ SimDir <- function(i,t,comportement="TP",cible=c())
   {
     # Liquidation possible si l'individu n'a pas encore liquidé et a validé au moins une période.
     # RAJOUT D'UNE CONDITION DE DUREE CN>0 POUR EVITER LIQUIDATIONS BIDONS D'INDIVIDUS SANS AUCUN DROITS
-    if (ageliq[i]==0 &&   (duree_tot>0 || (t>=AnneeDepartCN && duree_tot >0 && t-anaiss[i]>=55)))   ############   
+    if (ageliq[i]==0 &&   (duree_tot>0 || (t>=AnneeDepartCN && duree_tot >0 && t-t_naiss[i]>=55)))   ############   
     {  
     if (AgeMax(i,t))
     {
@@ -785,7 +785,7 @@ SimDir <- function(i,t,comportement="TP",cible=c())
     }
 #     else if (tolower(comportement) == "exo")   # AJOUT CONTROLES SI CIBLE MAL DEFINIE
 #     {
-#       if (!(is.na(cible[i])) && cible[i]>0 && (t-anaiss[i])==cible[i])
+#       if (!(is.na(cible[i])) && cible[i]>0 && (t-t_naiss[i])==cible[i])
 #       {
 #         Liq(i,t)
 #       }
@@ -809,8 +809,8 @@ SimDir <- function(i,t,comportement="TP",cible=c())
 #      print (c(i,cibletaux[i]))
       nvprev   <- salaire[i,t-1]*(1-0.2)    #Salaire "net", avec un taux de cotisation moyen ? 20%. 
       nvnondep <- salaire[i,t]
-      #$kinst = Max(Min(1,$k[0]),($k[0]*((1+$delta_k[0])**(Max(0,$agetest-60)))));
-      kinst <- k[i]*((1+delta_k[i])^(max(0,(t-anaiss[i])-60)))
+      #kinst = Max(Min(1,k[0]),(k[0]*((1+delta_k[0])**(Max(0,agetest-60)))));
+      kinst <- k[i]*((1+delta_k[i])^(max(0,(t-t_naiss[i])-60)))
       cibletaux[i]<<-1/kinst 
 #      print (c(i,cibletaux[i]))
       Clone(i,taille_max)
@@ -838,81 +838,187 @@ SimDir <- function(i,t,comportement="TP",cible=c())
 
 ##################################### V. Calcul d'indicateurs derives
 
-########Fonction CotRet
+
+########Fonction CotRetSal 
 # Calcule la somme des cotisations retraite a une date donnee (il s'agit des cotisations salaries)
 # Exemples d'appel :
 # cotret[i,t]<- CotRet(i,t)
+# NB: correction par rapport à la version de Didier pour les cotisations sur salaire total. 
 
-CotRet <- function(i,t)                                   
+CotRetSal <- function(i,t)                                   
 {
   
-  sal_1        <- rep(0,t)
-  sal_2        <- rep(0,t)
-  sal_A        <- rep(0,t)
-  sal_B        <- rep(0,t)
-  sal_C        <- rep(0,t)
+  # Tranches de salaires : création de variables de series temporelles de salaires.
+  # =salaire à l'année t quand l'individu est dans la catégorie en question, 0 sinon.
+  # (meme procede quand dans la fonction Points(i,t) )
+  
+  sal_tot_c      <- rep(0,t)  # Salaire total cadre
+  sal_tot_nc     <- rep(0,t)  # Salaire total non-cadre
+  sal_1          <- rep(0,t)  # Non-cadre sous plafond
+  sal_2          <- rep(0,t)  # Non-cadre entre 1 et 3 plafonds
+  sal_A          <- rep(0,t)  # Cadre sous plafond
+  sal_B          <- rep(0,t)  # Cadre entre 1 et 4 plafonds
+  sal_C          <- rep(0,t)  # Cadre entre 4 et 8 plafonds
+  sal_sp_ind     <- rep(0,t)  # Indep sous plafond
+  sal_tot_ind    <- rep(0,t)  # Salaire total Indep
+  sal_FP         <- rep(0,t)  # Salaire fp (total)
+  
+  
+  sal_tot_c    <- part(salaire[i,1:t],               0,  1e+08,which(statut[i,1:t]==cadre))
+  sal_tot_nc   <- part(salaire[i,1:t],               0,  1e+08,which(statut[i,1:t]==non_cadre))
   sal_1        <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which(statut[i,1:t]==non_cadre))
-  sal_2        <- part(salaire[1,1:t],  PlafondSS[1:t],3*PlafondSS[1:t],which(statut[1,1:t]==non_cadre))
+  sal_2        <- part(salaire[i,1:t],  PlafondSS[1:t],3*PlafondSS[1:t],which(statut[1,1:t]==non_cadre))
   sal_A        <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which(statut[i,1:t]==cadre))
   sal_B        <- part(salaire[i,1:t],  PlafondSS[1:t],4*PlafondSS[1:t],which(statut[i,1:t]==cadre))
   sal_C        <- part(salaire[i,1:t],4*PlafondSS[1:t],8*PlafondSS[1:t],which(statut[i,1:t]==cadre))
+  sal_sp_ind   <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which(statut[i,1:t]==indep))
+  sal_tot_ind  <- part(salaire[i,1:t],               0,  1e+08,which(statut[i,1:t]==indep))
+  sal_FP       <- part(salaire[i,1:t],               0,  1e+06,which((statut[i,1:t]==fonct_a) | (statut[i,1:t]==fonct_s))) 
+  
+  # Calcul de la somme des cotisations versées  
+  # (application du taux correspondant à la tranche de salaire) 
+  
+  cot_non_cadre <-   sum(TauxSalRGSalTot[1:t]*sal_tot_nc[1:t])                            +
+    sum(TauxSalRGSP[1:t]*sal_1[1:t])                                    +
+    sum(TauxARRCO_S1[1:t]*TauxAppARRCO[1:t]*sal_1[1:t])                 +
+    sum(TauxARRCO_S2[1:t]*TauxAppARRCO[1:t]*sal_2[1:t]) 
+  
+  cot_cadre     <-   sum(TauxSalRGSalTot[1:t]*sal_tot_c[1:t])         +
+    sum(TauxSalRGSP[1:t]*sal_A[1:t])                                   +
+    sum(TauxARRCO_S1[1:t]*TauxAppARRCO[1:t]*sal_B[1:t])                +
+    sum(TauxARRCO_S2[1:t]*TauxAppARRCO[1:t]*sal_C[1:t]) 
   
   
-
-cot_non_cadre <-   sum(TauxSalRGSalTot[1:t]*salaire[i,statut[i,t]%in% non_cadre])      +
-                   sum(TauxSalRGSP[1:t]*sal_1[1:t])                                    +
-                   sum(TauxARRCO_S1[1:t]*TauxAppARRCO[1:t]*sal_1[1:t])                 +
-                   sum(TauxARRCO_S2[1:t]*TauxAppARRCO[1:t]*sal_2[1:t]) 
-
-cot_cadre     <-   sum(TauxSalRGSalTot[1:t]*salaire[i,statut[i,t]%in% cadre])         +
-                   sum(TauxSalRGSP[1:t]*sal_A[1:t])                                   +
-                   sum(TauxARRCO_S1[1:t]*TauxAppARRCO[1:t]*sal_B[1:t])                +
-                   sum(TauxARRCO_S2[1:t]*TauxAppARRCO[1:t]*sal_C[1:t]) 
-
-
-
-cot_fp <- sum(TauxFP[1:t]*salaire[i,statut[i,t]%in% c(fonct_a,fonct_s)]/(1+taux_prim[i]))
-
-cot_ind <- sum(TauxSalRGSalTot[1:t]*salaire[i,statut[i,t]%in% indep])  +
-           sum(TauxSalRGSP[t]*Part(salaire[i,t],0,PlafondSS[t])) 
   
-cot <- cot_fp + cot_ind + cot_cadre + cot_non_cadre
-               
-               
-            
- 
-return (cot)
-              
+  # Fonction publique
+  cotfp <-  sum(sal_FP[1: t]*TauxFP[1:t]/(1+tauxprime[i]))
+  
+  # Independants  
+  cotind <- sum(sal_I_sp[1: t]*TauxSalRGSP[1:t]) +      # Cotisations sous plafond 
+            sum(sal_I_tot[1: t]*TauxSalRGSalTot[1:t])   # Cotisations sur salaire entier
+  
+  cot <- cot_fp + cot_ind + cot_cadre + cot_non_cadre
+  
+  #print (c(cot_fp , cot_ind , cot_cadre , cot_non_cadre))
+  
+  
+  return (cot)
+  
+}
+
+
+####### Fonction CotRetTot  
+# La fonction CotRet calcule les cotisations retraites versées depuis le début de la carrière 
+# jusqu'à une date t donnée.
+# Cotisation salariale + patronale
+# exemple d'appel: cot[i]<- CotRet(i,t)
+
+CotRetTot <- function(i,t)
+{
+  cotrg    <- 0
+  cotarrco <- 0
+  cotagirc <- 0
+  cotfp    <- 0
+  cotind   <- 0
+  
+  # Tranches de salaires : création de variables de series temporelles de salaires.
+  # =salaire à l'année t quand l'individu est dans la catégorie en question, 0 sinon.
+  # (meme procede quand dans la fonction Points(i,t) )
+  
+  sal_rg_sp      <- rep(0,t)  # Régime général sous plafond
+  sal_rg_tot     <- rep(0,t)  # Régime général total
+  sal_1          <- rep(0,t)  # Non-cadre sous plafond
+  sal_2          <- rep(0,t)  # Non-cadre entre 1 et 3 plafonds
+  sal_1          <- rep(0,t)  # Cadre sous plafond
+  sal_2          <- rep(0,t)  # Cadre entre 1 et 4 plafonds
+  sal_3          <- rep(0,t)  # Cadre entre 4 et 8 plafonds
+  sal_FP      <- rep(0,t)     # FP total
+  sal_I_sp       <- rep(0,t)  # Indep sous plafond
+  sal_I_tot      <- rep(0,t) # Indep total
+  
+  sal_rg_sp      <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which((statut[i,1:t]==cadre) | (statut[i,1:t]==non_cadre)))
+  sal_rg_tot     <- part(salaire[i,1:t],               0,  1e+08,which((statut[i,1:t]==cadre) | (statut[i,1:t]==non_cadre))) 
+  sal_1          <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which(statut[i,1:t]==non_cadre))
+  sal_2          <- part(salaire[i,1:t],  PlafondSS[1:t],3*PlafondSS[1:t],which(statut[i,1:t]==non_cadre))
+  sal_A          <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which(statut[i,1:t]==cadre))
+  sal_B          <- part(salaire[i,1:t],  PlafondSS[1:t],4*PlafondSS[1:t],which(statut[i,1:t]==cadre))
+  sal_C          <- part(salaire[i,1:t],4*PlafondSS[1:t],8*PlafondSS[1:t],which(statut[i,1:t]==cadre))
+  sal_FP         <- part(salaire[i,1:t],               0,  1e+08,which((statut[i,1:t]==fonct_a) | (statut[i,1:t]==fonct_s))) 
+  sal_I_sp       <- part(salaire[i,1:t],               0,  PlafondSS[1:t],which(statut[i,1:t]==indep))
+  sal_I_tot      <- part(salaire[i,1:t],               0,  1e+08,which(statut[i,1:t]==indep))
+  
+  
+  # Calcul de la somme des cotisations versées  
+  # (application du taux correspondant à la tranche de salaire)
+  
+  # Au RG  
+  cotrg <- sum(sal_rg_sp[t_naiss[i]: t]*TauxTotRGSP[t_naiss[i]:t]) +      # Cotisations sous plafond 
+    sum(sal_rg_tot[t_naiss[i]: t]*TauxTotRGSalTot[t_naiss[i]:t])   # Cotisations sur salaire entier
+  
+  # Regimes complementaires
+  cotarrco  <-sum(sal_1[47: t]*TauxARRCO_1[47:t]*TauxAppARRCO[47:t]) +   # Tranche 1 non-cadre
+    sum(sal_2[47: t]*TauxARRCO_2[47:t]*TauxAppARRCO[47:t]) +   # Tranche 2 non-cadre
+    sum(sal_A[47: t]*TauxARRCO_1[47:t]*TauxAppARRCO[47:t])      # Tranche A cadre
+  
+  cotagirc  <-sum(sal_B[47: t]*TauxAGIRC_B[47:t]*TauxAppAGIRC[47:t]) +
+    sum(sal_C[47: t]*TauxAGIRC_C[47:t]*TauxAppAGIRC[47:t])
+  
+  # Fonction publique
+  cotfp <-  sum(sal_FP[t_naiss[i]: t]*TauxFP[t_naiss[i]:t]/(1+tauxprime[i]))
+  
+  # Independants  
+  cotind <- sum(sal_I_sp[t_naiss[i]: t]*TauxTotRGSP[t_naiss[i]:t]) +      # Cotisations sous plafond 
+            sum(sal_I_tot[t_naiss[i]: t]*TauxTotRGSalTot[t_naiss[i]:t])   # Cotisations sur salaire entier
+  
+  
+  cotrettot <- cotrg + cotagirc + cotarrco + cotfp + cotind
+  #  print (c("cot",cotrg,cotrg ,cotagirc ,cotarrco, cotfp ,cotind))
+  
+  return (cotrettot)                           
 }
 
 
 
-# ### Partie test sur cas types
-# Test <- function(tliq,generation,debut_carr,saldeb,salfin,secteur) 
-# {
-#   anaiss[1] <<- generation
-#   sexe[1]   <<- 1
-#   n_enf[1]  <<- 2
-#   for (e in 1:n_enf[1])
-#   {
-#     enf[1,e]     <<- 10+e
-#     anaiss[10+e] <<- 70+2*e
-#   }
-#   findet[1] <<- debut_carr-anaiss[1]-1
-#   statut[1,1:anaiss[1]-1]              <<- pas_ne
-#   statut[1,anaiss[1]:(debut_carr-1)]   <<- inactif
-#   statut[1,debut_carr:(anaiss[1]+80)]  <<- secteur
-#   for (t in debut_carr:(anaiss[1]+80))
-#   {
-#     salaire[1,t] <<- PlafondSS[t]*affn(t,c(debut_carr,generation+60),c(saldeb,salfin))
-#   }
-#   print (statut[1,])
-#   print (salaire[1,])
-#   UseLeg(tliq,anaiss[1])
-#   Liq(1,tliq)
-#   print (c(tliq-anaiss[1],duree_tot,duree_tot_maj,sam_rg,sam_in,sr_fp,points_arrco,points_agirc))
-#   print (c(pension[1],pension_rg[1],pension_ar[1],pension_ag[1],pension_fp[1],pension_in[1]))
-# }
-# 
-# Test(110,50,70,0.75,1.5,cadre)
-# 
+######## Fonction CotRetTotAnn  
+# La fonction CotRetTotAnn calcule les cotisations retraites (salariales)
+# pendant une année t donnée (sur le modèle de CotRet de Destinie)
+# exemple d'appel: cot[i]<- CotRetTotAnn(i,t)
+
+CotRetSalAnn <- function(i,t)
+{
+
+if      (statut[i,t]==non_cadre)
+  {
+  cot <- TauxSalRGSalTot[t]*salaire[i,t] +                                                                    
+         TauxSalRGSP[t] *                part(salaire[i,t],            0,  PlafondSS[t])     +
+         TauxARRCO_S1[t]*TauxAppARRCO[t]*part(salaire[i,t],            0,  PlafondSS[t])     +
+         TauxARRCO_S2[t]*TauxAppARRCO[t]*part(salaire[i,t], PlafondSS[t],3*PlafondSS[t])
+  }
+else if (statut[i,t]==cadre)
+  {
+  cot <- TauxSalRGSalTot[t]*salaire[i,t]+
+         TauxSalRGSP[t]*                 part(salaire[i,t],             0,  PlafondSS[t])
+         TauxARRCO_S1[t]*TauxAppARRCO[t]*part(salaire[i,t],             0,  PlafondSS[t])
+         TauxAGIRC_SB[t]*TauxAppAGIRC[t]*part(salaire[i,t],  PlafondSS[t],4*PlafondSS[t])
+         TauxAGIRC_SC[t]*TauxAppAGIRC[t]*part(salaire[i,t],4*PlafondSS[t],8*PlafondSS[t])
+  }
+else if (is.element(statut[i,t],c(fonct_a,fonct_s)))
+ {
+ cot  <- TauxFP[t]*salaire[i,t]/(1+tauxprime[i]);
+ }
+
+else if (statut[i,t] == indep)
+ {
+ cot <-  TauxSalRGSalTot[t]*salaire[i,t] +
+         TauxSalRGSP[t]*part(salaire[i,t],0,PlafondSS[t])
+ }
+
+else
+ {
+ cot <- 0
+  }
+  
+return (cot)
+
+}
+  

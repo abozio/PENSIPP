@@ -979,8 +979,8 @@ CotRetTot <- function(i,t)
 
 
 
-######## Fonction CotRetTotAnn  
-# La fonction CotRetTotAnn calcule les cotisations retraites (salariales)
+######## Fonction CotRetSalAnn  
+# La fonction CotRetSalAnn calcule les cotisations retraites (salariales)
 # pendant une année t donnée (sur le modèle de CotRet de Destinie)
 # exemple d'appel: cot[i]<- CotRetTotAnn(i,t)
 
@@ -1022,3 +1022,47 @@ return (cot)
 
 }
   
+
+######## Fonction CotRetTotAnn  
+# La fonction CotRetTotAnn calcule les cotisations retraites (salariales + patronales)
+# pendant une année t donnée (sur le modèle de CotRet de Destinie)
+# exemple d'appel: cot[i]<- CotRetTotAnn(i,t)
+
+CotRetTotAnn <- function(i,t)
+{
+  
+  if      (is.element(statut[i,t],c(non_cadre,non_cadreCN)))
+  {
+    cot <- TauxTotRGSalTot[t]*salaire[i,t] +                                                                    
+      TauxTotRGSP[t] *              part(salaire[i,t],            0,  PlafondSS[t])     +
+      TauxARRCO_1[t]*TauxAppARRCO[t]*part(salaire[i,t],            0,  PlafondSS[t])     +
+      TauxARRCO_2[t]*TauxAppARRCO[t]*part(salaire[i,t], PlafondSS[t],3*PlafondSS[t])
+  }
+  else if (is.element(statut[i,t],c(cadre,cadreCN)))
+  {
+    cot <- TauxTotRGSalTot[t]*salaire[i,t]+
+      TauxTotRGSP[t]*                 part(salaire[i,t],             0,  PlafondSS[t])
+    TauxARRCO_1[t]*TauxAppARRCO[t]*part(salaire[i,t],             0,  PlafondSS[t])
+    TauxAGIRC_B[t]*TauxAppAGIRC[t]*part(salaire[i,t],  PlafondSS[t],4*PlafondSS[t])
+    TauxAGIRC_C[t]*TauxAppAGIRC[t]*part(salaire[i,t],4*PlafondSS[t],8*PlafondSS[t])
+  }
+  else if (is.element(statut[i,t],c(fonct_a,fonct_s,fonct_aCN,fonct_sCN)))
+  {
+    cot  <- TauxFP[t]*salaire[i,t]/(1+tauxprime[i]);
+  }
+  
+  else if (is.element(statut[i,t],c(indep,indepCN)))
+  {
+    cot <-  TauxTotRGSalTot[t]*salaire[i,t] +
+      TauxTotRGSP[t]*part(salaire[i,t],0,PlafondSS[t])
+  }
+  
+  else
+  {
+    cot <- 0
+  }
+  
+  return (cot)
+  
+}
+

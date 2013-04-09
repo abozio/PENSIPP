@@ -46,7 +46,7 @@ PENREL      <- matrix(nrow=4,ncol=200)    # Ratio pension/salaire
 
 #### Début de la simulation ####
 
-for (sc in c(1,2,3))     #Debut boucle scénarios
+for (sc in c(3))     #Debut boucle scénarios
 {       
   
  # Reinitialisation variables
@@ -58,10 +58,15 @@ for (sc in c(1,2,3))     #Debut boucle scénarios
   # UseOpt(c("nobonif","nomda","noassimil","nomc","nomg","noptsgratuits","noavpf"))
   W           <- 2047.501    # Poids de l'échantillon
 # Options CN  
-  TauxCotCN[]                 <- 0.27 #MPENS[1,115]/MSAL[1,115]
+
   AnneeDepartCN <- 115
+  TauxCotCN[]                 <- 0.27 
   plafond <- 8
-  if (sc==3) {UseOptCN(c("valocot"))}
+  if (sc==3)        
+  {
+  TauxCotCN[1:AnneeDepartCN]   <- 0  
+  UseOptCN(c("valocot"))
+  }
   
   for (t in 80:160)   # Début boucle temporelle
   {
@@ -78,7 +83,7 @@ for (sc in c(1,2,3))     #Debut boucle scénarios
     }
   
     
-    if (sc==2 && t==AnneeDepartCN)
+    if (sc>1 && t==AnneeDepartCN)
     {
       for (i in 1:55000)
       {
@@ -95,23 +100,23 @@ for (sc in c(1,2,3))     #Debut boucle scénarios
       }
     }
     
-    if (sc==3 && t==AnneeDepartCN)      # Changement des statuts à partir de AnneeDepartCN seulement
-    {
-      for (i in 1:55000)
-      {
-        if (ageliq[i]==0)
-        {
-          for (u in AnneeDepartCN:160)
-          {
-            if (is.element(statut[i,u],codes_act))
-            {
-              statut[i,u] <- statut[i,u]+100
-            }
-          }
-        }
-      }
-    }
-    
+#     if (sc==3 && t==AnneeDepartCN)      # Changement des statuts à partir de AnneeDepartCN seulement
+#     {
+#       for (i in 1:55000)
+#       {
+#         if (ageliq[i]==0)
+#         {
+#           for (u in AnneeDepartCN:160)
+#           {
+#             if (is.element(statut[i,u],codes_act))
+#             {
+#               statut[i,u] <- statut[i,u]+100
+#             }
+#           }
+#         }
+#       }
+#     }
+#     
       
       
     # Liquidations  
@@ -136,7 +141,7 @@ for (sc in c(1,2,3))     #Debut boucle scénarios
         if (t_liq[i]==t)
         {
           # Enlever les pensions de l'ancien régime (à améliorer!)
-          if (sc>1) { pension[i]<-pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]}
+          #  if (sc>1) { pension[i]<-pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]}
           
           pliq_[i,sc] <- pension[i]
           if (sc==1) {ageref[i] <- t-t_naiss[i]}
@@ -198,4 +203,4 @@ abline(0,1,col="red")
 
 
 
-save.image("~/Desktop/PENSIPP 0.1/Simulations/CN/CN1b/Resulats.RData")
+save.image("~/Desktop/PENSIPP 0.1/Simulations/CN/CN1b/Resulats2.RData")

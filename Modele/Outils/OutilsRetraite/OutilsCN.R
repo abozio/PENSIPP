@@ -100,8 +100,7 @@ PointsCN <- function(i,t,plafond)
       
   if (is.element("valocot",OptionsCN))
   {
-  if (a < AnneeDepartCN) {points_cn_pri <<- points_cn_pri + CotRetSalAnn(i,a)}
-  if (a == AnneeDepartCN) {statut[i,1:(AnneeDepartCN-1)]<<-0}
+  if (a < AnneeDepartCN) {points_cn_pri <<- points_cn_pri + CotRetTotAnn(i,a)}
   # ajouté au point privé par défault (décomposition par régime nécessaire?)
   }
 

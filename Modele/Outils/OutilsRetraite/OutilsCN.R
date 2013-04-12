@@ -22,7 +22,7 @@ UseOptCN <- function(liste=c())
   for (i in 1:length(liste))
   {
     OptionsCN[i] <<- tolower(liste[i])
-    if (!(is.element(OptionsCN[i],c("valocot")))) 
+    if (!(is.element(OptionsCN[i],c("valocot","noassimilcn","noavpfcn","nomdacn","nobonifcn","nomccn")))) 
     {
       print (paste("Attention : option '",OptionsCN[i],"' inconnue"))
     }
@@ -87,7 +87,9 @@ PointsCN <- function(i,t,plafond)
   points_cn_pri  <<- 0
   points_cn_fp   <<- 0
   points_cn_ind  <<- 0
+  points_cn_nc   <<- 0
   # Calcul des cumuls de points CN, selon étendue du nouveau régime
+  
   if (t>=AnneeDepartCN)
   {
     for (a in (30:t))   
@@ -97,6 +99,7 @@ PointsCN <- function(i,t,plafond)
       points_cn_pri <<- points_cn_pri*(1+RendementCN[a-1])
       points_cn_ind <<- points_cn_ind*(1+RendementCN[a-1])
       points_cn_fp  <<- points_cn_fp* (1+RendementCN[a-1])
+      points_cn_nc  <<- points_cn_nc* (1+RendementCN[a-1])
       
   if (is.element("valocot",OptionsCN))
   {
@@ -104,24 +107,89 @@ PointsCN <- function(i,t,plafond)
   # ajouté au point privé par défault (décomposition par régime nécessaire?)
   }
 
-      
+
+# PointsCN pour les periodes travaillees.  
 
  if (statut[i,a]%in% c(cadreCN,non_cadreCN))
  {
    points_cn_pri <<- points_cn_pri + TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
+   
+   # MICO
+   if ((!(is.element("nomccn",OptionsCN))) & (TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])<TauxCotCN[a]*0.5*SMIC[a]))
+   {
+   points_cn_pri <<- points_cn_pri + (TauxCotCN[a]*0.5*SMIC[a] - TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])) 
+   }
  # print(c(plafond,min(salaire[i,a],plafond*PlafondSS[a])))
  }
+      
  else if (statut[i,a]%in% indepCN)
  {
    points_cn_ind<<-points_cn_ind + TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
+   
+   # MICO
+   if ((!(is.element("nomccn",OptionsCN))) & (TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])<TauxCotCN[a]*0.5*SMIC[a]))
+   {
+     points_cn_ind <<- points_cn_ind + (TauxCotCN[a]*0.5*SMIC[a] - TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])) 
+   }
  }
+      
  else if (statut[i,a]%in% c(fonct_aCN,fonct_sCN))
  {
    points_cn_fp  <<- points_cn_fp+ TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
+   
+   # MICO
+   if ((!(is.element("nomccn",OptionsCN))) & (TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])<TauxCotCN[a]*0.5*SMIC[a]))
+   {
+   points_cn_fp <<- points_cn_fp + (TauxCotCN[a]*0.5*SMIC[a] - TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])) 
+   }
+   
  }
 
+# Avantages Non contributifs CN
+
+if ((statut[i,a]== chomeurCN) & (!(is.element("noassimilcn",OptionsCN))))
+{
+#  print(c("chom",a))
+# Assiette de cotisation: salaire de l'année précédente ou SMIC, plafonné à 4 SMIC.   
+salref <- min(max(salaire[i,(a-1)],SMIC[a]),2*SMIC[a])
+points_cn_nc  <<- points_cn_nc+ TauxCotCN[115]*salref
+}  
+
+# AVPF
+if ((statut[i,a]%in% avpfCN) & (!(is.element("noavpfcn",OptionsCN))))
+{
+#  print(c("avpf",a))
+  # Assiette de cotisation: SMIC de l'annee en cours.   
+  points_cn_nc  <<- points_cn_nc+ TauxCotCN[115]*SMIC[a]
+}  
+
+# MDA (lors d'une naissance a l'annee a)
+if ((sexe[i]==2) &(is.element(a,t_naiss[enf[i,]])) & (!(is.element("nomdacn",OptionsCN))))
+{
+#print(c("mda",a))
+  # Assiette de cotisation: Moyenne des salaire des années précédentes ou SMIC, plafonne à 4 SMIC., plafonné à 4 SMIC.  
+  #liste <- which(is.element(statut[i,1:a],codes_occCN))
+ # salref<-min(max(mean(salaire[i,liste]),SMIC[a]),4*SMIC[a])
+  salref <- min(max(salaire[i,(a-1)],SMIC[a]),2*SMIC[a])
+  points_cn_nc  <<- points_cn_nc + TauxCotCN[115]*salref
+}  
+
+#print(c(points_cn_nc,a))
+
+  }  # Fin boucle sur a
       
-    }  # Fin boucle sur a
- #   print(c(points_cn_pri,points_cn_ind,points_cn_fp))  
+#Bonfication pour pension: 
+if (!(is.element("nobonifcn",OptionsCN)))
+{
+if (n_enf[i]>2)
+{ 
+
+  points_cn_pri<<- 1.10*points_cn_pri 
+  points_cn_fp <<- 1.10*points_cn_fp 
+  points_cn_inf<<- 1.10*points_cn_ind
+  points_cn_nc <<- 1.10*points_cn_nc
+}
+}
+
   }
 }

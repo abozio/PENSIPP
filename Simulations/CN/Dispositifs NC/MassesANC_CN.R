@@ -94,7 +94,7 @@ for (sc in c(1,2,3,4,5,6,7)) #(sc in c(1,2,3,4,5,6,7))
     
     if (sc>1 && t==AnneeDepartCN)
     {
-      for (i in 1000:1100)
+      for (i in 1:55000)
       {
         if (ageliq[i]==0)
         {
@@ -105,7 +105,7 @@ for (sc in c(1,2,3,4,5,6,7)) #(sc in c(1,2,3,4,5,6,7))
     
     
     # Liquidations  
-    for (i in 1000:1100)       # Début boucle individuelle
+    for (i in 1:55000)       # Début boucle individuelle
     {
       Leg <- t
       
@@ -169,7 +169,7 @@ for (sc in c(1,2,3,4,5,6,7)) #(sc in c(1,2,3,4,5,6,7))
 
 
 #### Sorties ####
-graph_compar(MPENLIQ       ,110,159,"Masse des pensions à liquidations")
+graph_compar(MPENLIQ2       ,110,159,"Masse des pensions à liquidations")
 #graph_compar(MPEN          ,110,159,"Ratio pension/salaire")
 
 

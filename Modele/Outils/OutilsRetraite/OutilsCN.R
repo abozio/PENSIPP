@@ -88,6 +88,7 @@ PointsCN <- function(i,t,plafond)
   points_cn_fp   <<- 0
   points_cn_ind  <<- 0
   points_cn_nc   <<- 0
+  points_mccn    <<- 0
   # Calcul des cumuls de points CN, selon étendue du nouveau régime
   
   if (t>=AnneeDepartCN)
@@ -113,35 +114,17 @@ PointsCN <- function(i,t,plafond)
  if (statut[i,a]%in% c(cadreCN,non_cadreCN))
  {
    points_cn_pri <<- points_cn_pri + TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
-   
-   # MICO
-   if ((!(is.element("nomccn",OptionsCN))) & (TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])<TauxCotCN[a]*0.5*SMIC[a]))
-   {
-   points_cn_pri <<- points_cn_pri + (TauxCotCN[a]*0.5*SMIC[a] - TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])) 
-   }
  # print(c(plafond,min(salaire[i,a],plafond*PlafondSS[a])))
  }
       
  else if (statut[i,a]%in% indepCN)
  {
    points_cn_ind<<-points_cn_ind + TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
-   
-   # MICO
-   if ((!(is.element("nomccn",OptionsCN))) & (TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])<TauxCotCN[a]*0.5*SMIC[a]))
-   {
-     points_cn_ind <<- points_cn_ind + (TauxCotCN[a]*0.5*SMIC[a] - TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])) 
-   }
  }
       
  else if (statut[i,a]%in% c(fonct_aCN,fonct_sCN))
  {
    points_cn_fp  <<- points_cn_fp+ TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])
-   
-   # MICO
-   if ((!(is.element("nomccn",OptionsCN))) & (TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])<TauxCotCN[a]*0.5*SMIC[a]))
-   {
-   points_cn_fp <<- points_cn_fp + (TauxCotCN[a]*0.5*SMIC[a] - TauxCotCN[a]*min(salaire[i,a],plafond*PlafondSS[a])) 
-   }
    
  }
 
@@ -149,16 +132,18 @@ PointsCN <- function(i,t,plafond)
 
 if ((statut[i,a]== chomeurCN) & (!(is.element("noassimilcn",OptionsCN))))
 {
-#  print(c("chom",a))
-# Assiette de cotisation: salaire de l'année précédente ou SMIC, plafonné à 4 SMIC.   
-salref <- min(max(salaire[i,(a-1)],SMIC[a]),2*SMIC[a])
+# print(c("chom",a))
+# Assiette de cotisation: dernier salaire ou SMIC, plafonné à 4 SMIC.   
+liste <- which(salaire[i,1:(a-1)]>0)
+salref<- salaire[i,liste[length(liste)]]  
+salref <- min(max(salref,SMIC[a]),4*SMIC[a])
 points_cn_nc  <<- points_cn_nc+ TauxCotCN[115]*salref
 }  
 
 # AVPF
 if ((statut[i,a]%in% avpfCN) & (!(is.element("noavpfcn",OptionsCN))))
 {
-#  print(c("avpf",a))
+ #print(c("avpf",a))
   # Assiette de cotisation: SMIC de l'annee en cours.   
   points_cn_nc  <<- points_cn_nc+ TauxCotCN[115]*SMIC[a]
 }  
@@ -171,7 +156,7 @@ if ((sexe[i]==2) &(is.element(a,t_naiss[enf[i,]])) & (!(is.element("nomdacn",Opt
   #liste <- which(is.element(statut[i,1:a],codes_occCN))
  # salref<-min(max(mean(salaire[i,liste]),SMIC[a]),4*SMIC[a])
   salref <- min(max(salaire[i,(a-1)],SMIC[a]),2*SMIC[a])
-  points_cn_nc  <<- points_cn_nc + TauxCotCN[115]*salref
+  points_cn_nc  <<- points_cn_nc + 1.5*TauxCotCN[115]*salref
 }  
 
 #print(c(points_cn_nc,a))
@@ -183,13 +168,21 @@ if (!(is.element("nobonifcn",OptionsCN)))
 {
 if (n_enf[i]>2)
 { 
-
   points_cn_pri<<- 1.10*points_cn_pri 
   points_cn_fp <<- 1.10*points_cn_fp 
-  points_cn_inf<<- 1.10*points_cn_ind
+  points_cn_ind<<- 1.10*points_cn_ind
   points_cn_nc <<- 1.10*points_cn_nc
 }
 }
 
+# Calcul du MICO: 
+points_cn_cont <- points_cn_pri + points_cn_fp + points_cn_ind 
+seuil<-MinVieil1[t]/CoeffConv[60] # Seuil: nb de point pour avoir le minimum vieillesse 
+pfd <- SMIC[t]/CoeffConv[60]  # Pfd: plafond, nb de points pour lequel le mico est =0.
+txmc <- 0
+txmc<-affn(points_cn_cont,c(0,seuil,pfd),c(0.2,0.2,0))   
+points_mccn<<-txmc*points_cn_cont
+    
+    
   }
 }

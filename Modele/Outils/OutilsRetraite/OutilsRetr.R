@@ -232,7 +232,10 @@ SalBase <- function(i,t)
   if (length(annees_rg)>0) {sam_rg <<- mean(sort(spc[annees_rg],decreasing=TRUE)[1:min(DureeCalcSAM,length(annees_rg))])}
   if (length(annees_in)>0) {sam_in <<- mean(sort(spc[annees_in],decreasing=TRUE)[1:min(DureeCalcSAM,length(annees_in))])}
   if (length(annees_fp)>0) {sr_fp  <<- salaire[i,max(annees_fp)]*PointFP[t]/PointFP[max(annees_fp)]}
- 
+
+# Prise en compte du salaire hors primes
+  sr_fp<-sr_fp/(1+(tauxprime[i]))
+  
   #MODIFSR#
 }
 
@@ -278,7 +281,7 @@ Points <- function(i,t)
  {
  Pts_B_GMP<-pmax((GMP[1:160]*(statut[i,1:160]==cadre)),(sal_B[1:160]*TauxAGIRC_B[1:160] /SalRefAGIRC[1:160]))
  points_agirc <<-  sum(Pts_B_GMP[47: t]) +
-   sum(sal_C[47: t]*TauxAGIRC_C[47:t] /SalRefAGIRC[47:t])
+ sum(sal_C[47: t]*TauxAGIRC_C[47:t] /SalRefAGIRC[47:t])
  }
  else
 {points_agirc <<- sum(sal_B[47: t]*TauxAGIRC_B[47:t] /SalRefAGIRC[47:t]) +sum(sal_C[47: t]*TauxAGIRC_C[47:t] /SalRefAGIRC[47:t])}
@@ -295,7 +298,7 @@ Points <- function(i,t)
 MinCont <- function(i,t)
 {
   majo      <-  Mincont2[t]-Mincont1[t]
-  min_cont  <<- 0;
+  min_cont  <<- 0
   
   if (TauxPlein(i,t))
   {
@@ -327,6 +330,7 @@ MinCont <- function(i,t)
       }
     }
   }
+
 }
 
 ############ MinGaranti
@@ -640,10 +644,10 @@ Liq <- function(i,t)
   # Application du minimum garanti
   # pour l'instant la valeur du point d'indice est bidon
   # le resultat est donc faux, mais le calcul fonctionne
-  if (!(is.element("nomg",Options)) && (pension_fp[i]==0))
+  if (!(is.element("nomg",Options)) && (pension_fp[i]>0))
   {
     pension_fp[i]    <<- max(pension_fp[i],min_garanti)
-    if (pension_fp[i] <= min_garanti) {indic_mg[i] <<- 1}
+    if (pension_fp[i] == min_garanti) {indic_mg[i] <<- 1}
   }
   
   # Application optionnelle de la Bonif pour 3 enfants et plus
@@ -683,16 +687,29 @@ Liq <- function(i,t)
 #  print (c(pension_cn_pri[i],CoeffConv[t-t_naiss[i]],points_cn_pri))
   pension_cn_fp[i]  <<-CoeffConv[t-t_naiss[i]]*points_cn_fp
   pension_cn_ind[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_ind
+  pension_cn_nc[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_nc
+  
+  #Mico
+  if (!(is.element("nomccn",OptionsCN))) {mccn[i] <<-CoeffConv[t-t_naiss[i]]*points_mccn}      
+  
    }
   
   ######### Mises a jour finales ##############################################
 
   pension[i]             <<- pension_rg[i]+pension_ar[i]+pension_ag[i]+
                              pension_fp[i]+pension_in[i]+
-                             pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]
+                             pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]+pension_cn_nc[i]
+  # Sauvegarde la pension sans Min
+  pension_nomin[i] <<- pension[i]
+  
+  # Minimum vieillesse (provisoire)
+  if ((pension[i]<MinVieil1[t])&(t_naiss[i]+t>=65)){pension[i]<<-MinVieil1[t]} 
+  # MicoCN
+  pension[i]<<-pension[i]+mccn[i]
+  
   pliq[i]                <<- pension[i]
   ageliq[i]              <<- t-t_naiss[i]
-  t_liq[i]                 <<- t
+  t_liq[i]               <<- t
   
   
   
@@ -737,8 +754,13 @@ Revalo <- function(i,t1,t2)
   pension[i]  <<- pension_rg[i]+pension_ar[i]+pension_ag[i]+
                   pension_fp[i]+pension_in[i]+
                   pension_cn_pri[i]+pension_cn_fp[i]+  pension_cn_ind[i]
+  
+  # Minimum vieillesse (provisoire)
+  if ((pension[i]<MinVieil1[t])& (t_naiss[i]+t>=65)) {pension[i]<<-MinVieil1[t]} 
+  
   rev[i]      <<- rev_rg[i]+rev_ar[i]+rev_ag[i]+
                   rev_fp[i]+rev_in[i]
+  
 }
 
 

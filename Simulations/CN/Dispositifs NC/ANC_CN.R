@@ -21,6 +21,7 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsCN.R"          
 
 ageref      <- numeric(taille_max)
 pliq_       <- matrix(nrow=taille_max,ncol=7)
+points_nc   <- matrix(nrow=taille_max,ncol=7)
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
@@ -50,7 +51,7 @@ cot<-numeric(taille_max)
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(1,2,3,4,5,6,7))
+for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
 {
 #  1: Normal Ref  
 #  2: Normal CN
@@ -97,7 +98,7 @@ for (sc in c(1,2,3,4,5,6,7))
     
     if (sc>1 && t==AnneeDepartCN)
     {
-      for (i in 1:10000)
+      for (i in 1:55000)
       {
         if (ageliq[i]==0)
         {
@@ -108,7 +109,7 @@ for (sc in c(1,2,3,4,5,6,7))
     
     
     # Liquidations  
-    for (i in 1:10000)       # Début boucle individuelle
+    for (i in 1:55000)       # Début boucle individuelle
     {
       Leg <- t
       
@@ -129,6 +130,7 @@ for (sc in c(1,2,3,4,5,6,7))
         if (t_liq[i]==t)
         { 
           pliq_[i,sc] <- pension[i]
+          points_nc[i,sc] <- points_cn_nc
           if (sc==1) {ageref[i] <- t-t_naiss[i]}
         }
       } 
@@ -169,9 +171,17 @@ for (sc in c(1,2,3,4,5,6,7))
   
 } # Fin boucle scenarios
 
-
+MPENS_CN  <- MPENS[2:7,]
+PENREL_CN <- PENREL[2:7,]
 
 #### Sorties ####
-graph_compar(MPENS[2:7,]       ,110,159,"Masse des pensions ")
-graph_compar(PENREL          ,110,159,"Ratio pension/salaire")
+graph_compar(MPENS[2:7,]     ,115,159,"Masse des pensions ")
+graph_compar(PENREL[2:7,]     ,115,159,"Ratio pension/salaire")
 save.image("~/Desktop/PENSIPP 0.1/Simulations/CN/Dispositifs NC/ANC_CN.RData")
+ 
+# plot   (seq(1900+110,1900+159,by=1),MPENS[5,110:159],xlab="Annee", ylab="masse pension",
+#         ylim=c(min(MPENS[5,110:159],na.rm=TRUE),max(MPENS[5,110:159],na.rm=TRUE)),lwd=2,col="orange",type="l")
+# points (seq(1900+110,1900+159,by=1),MPENS[6,110:159],lwd=4,type="l")
+# 
+# plot   (seq(1900+110,1900+159,by=1),MPENS[5,110:159]-MPENS[6,110:159],xlab="Annee", ylab="masse pension",
+#         ylim=c(min(MPENS[5,110:159]-MPENS[6,110:159],na.rm=TRUE),max(MPENS[5,110:159]-MPENS[6,110:159],na.rm=TRUE)),lwd=2,col="orange",type="l")

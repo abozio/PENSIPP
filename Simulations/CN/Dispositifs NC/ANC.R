@@ -79,7 +79,7 @@ for (sc in c(1,2,3,4,5,6,7))
 
   
     # Liquidations  
-    for (i in 1:10000)       # Début boucle individuelle
+    for (i in 1:55000)       # Début boucle individuelle
     {
       Leg <- t
       # Liquidation
@@ -144,8 +144,8 @@ for (sc in c(1,2,3,4,5,6,7))
 
 
 #### Sorties ####
-graph_compar(MPENS       ,110,159,"Masse des pensions ")
-graph_compar(PENREL      ,110,159,"Ratio pension/salaire")
+graph_compar(MPENS       ,115,159,"Masse des pensions ")
+graph_compar(PENREL      ,115,159,"Ratio pension/salaire")
 
 
 save.image("~/Desktop/PENSIPP 0.1/Simulations/CN/Dispositifs NC/ANC.RData")

@@ -6,11 +6,14 @@
 #[1] 90087093492 85766845923 81882572796 81842203794
 # 3993
 
-# Chargement des données
-cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
+# Chargement des donnees
+# cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
+cheminsource <- "D:/Github/PENSIPP/"
 load( (paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_CN.RData")))
+cheminsource <- "D:/Github/PENSIPP/"
 load( (paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC.RData")))
-  
+cheminsource <- "D:/Github/PENSIPP/"
+
 # Masse totale des ANC
 mtot   <- (MPENS[1,120]-MPENS[7,120])/1e9    
 mtot_cn<- (MPENS_CN[1,120]-MPENS_CN[6,120])/1e9
@@ -48,5 +51,5 @@ mtotDF+mtotPA+mtot
 
 REF=c(mtotDF,mtotPA,mtotMC)
 CN=c(mtotDF_cn,mtotPA_cn,mtotMC_cn)
-barplot(cbind(REF,CN),col=c("grey0","grey40","grey80"),legend = c("Droits familiaux","Périodes assimilées","Minima de pension"))
+barplot(cbind(REF,CN),col=c("grey0","grey40","grey80"),legend = c("Droits familiaux","Periodes assimilees","Minima de pension"))
 title("Masse des avantages contributif (2020, en Mds)")

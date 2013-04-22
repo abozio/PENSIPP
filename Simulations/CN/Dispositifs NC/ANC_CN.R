@@ -9,7 +9,7 @@ t0  <- Sys.time()
 #### Chargement des programmes source ####
 
 # Déclaration du chemin pour les fichiers sources
-cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
+cheminsource <- "D:/Github/PENSIPP/"
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsMS.R"           )) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsPensIPP.R"      )) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsLeg.R"          )) )

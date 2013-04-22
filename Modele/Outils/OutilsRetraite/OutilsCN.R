@@ -1,3 +1,10 @@
+#############################################################################################################
+# OutilsCN.R                                                                                                #
+#                                                                                                           #
+# D�finit les modalites d'un passage en comptes notionnels (CN).                                            #
+#                                                                                                           #
+#############################################################################################################
+
 
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsMS.R")) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsPensIPP.R")) )
@@ -5,16 +12,16 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsLeg.R")) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsRetr.R")) )
 
-###### Fonction UseOptCN
-# Spécifie les options supplémentaires si option "CN" a été demandées avec UseOpt.
-# Il y a deux arguments. Le premier est le millésime de démarrage du basculement.
-# Le second est une chaine de caract?re, avec les mêmes principes que dans UseOpt,
-# pouvant contenir les éléments suivants :
 
-# Exemples:
-#UseOptCN(2010,c("immediat", "rg"))
-
-
+###### Fonction UseOptCN -------
+# Specifie les options supplementaires si option "CN" a ete demandees avec UseOpt.
+# Il y a deux arguments:
+#    1) le millesime de demarrage du basculement; (AB: je ne vois pas le millesime dans la fonction)
+#    2) une chaine de caractere (memes principes que dans UseOpt) pouvant contenir les elements suivants :
+#        "valocot","nobonifcn","nomdacn","noavpfcn","noassimilcn","nomccn" (AB: v�rifier la liste exacte)
+# 
+# Exemple :
+# UseOptCN(2010,c("immediat", "rg"))
 
 UseOptCN <- function(liste=c())
 {
@@ -30,13 +37,14 @@ UseOptCN <- function(liste=c())
 }
 
 
-#####Fonction UseConv
-# Met a jour les coefficients de conversion si r?gime en comptes notionnels.
-# Il y a deux modes d'appel. Le premier mode doit-?tre utilis? lorsqu'on veut des
-# coefficients de conversion bas?s sur l'esp?rance de vie courante. 
-# Calcule les coefficients de conversion entre $agemin et $agemax ?gaux ? 60 et 70
-# ans sur la base de la mortalit?  de la date $t.
+#####Fonction UseConv --------
+# Met a jour les coefficients de conversion si regime en comptes notionnels.
+# Il y a deux modes d'appel. Le premier mode doit etre utilise lorsqu'on veut des coefficients de
+# conversion bases sur l'esperance de vie courante. 
+# Calcule les coefficients de conversion entre $agemin et $agemax egaux a 60 et 70
+# ans sur la base de la mortalite de la date $t.
 # Exemple : UseConv(60,70,$t);
+
 setwd((paste0(cheminsource,"Modele/Parametres/Demographie")))
        
 age_max      <- 121
@@ -50,12 +58,12 @@ quotient[2,,1:160] <- read_ap("QFnew.csv")
 
 UseConv <- function(agemin,agemax,t)
 {
-#  if (t>=AnneeDepartCN)   # Supprime : ne m'a pas semblé utile
+#  if (t>=AnneeDepartCN)   # Supprime : ne m'a pas semble utile
   {
-    # Coeffs définis par la mortalité (suppose que les coefficients de revalo
-    # prospectifs sont au moins définis jusqu'en 2050)
+    # Coeffs definis par la mortalite (suppose que les coefficients de revalo
+    # prospectifs sont au moins definis jusqu'en 2050)
     
-    taux_croi <- RendementCNPrev[t]-(RevaloCN[t]-1)      #NB : Revalo et rendement pas dans la m???me unit??? !)
+    taux_croi <- RendementCNPrev[t]-(RevaloCN[t]-1)      #NB : Revalo et rendement pas dans la meme unite !)
     for (a in (agemin:agemax))
     {
       CoeffConv[a] <<-0
@@ -79,8 +87,9 @@ UseConv <- function(agemin,agemax,t)
 
 
 
-##### Fonction PointsCN
-# Calcule les points portés au compte individuel acquis par l'individu i à la date t.
+##### Fonction PointsCN --------------
+# Calcule les points portes au compte individuel acquis par l'individu i a la date t.
+
 PointsCN <- function(i,t,plafond)
 {
 
@@ -89,7 +98,7 @@ PointsCN <- function(i,t,plafond)
   points_cn_ind  <<- 0
   points_cn_nc   <<- 0
   points_mccn    <<- 0
-  # Calcul des cumuls de points CN, selon étendue du nouveau régime
+  # Calcul des cumuls de points CN, selon etendue du nouveau regime
   
   if (t>=AnneeDepartCN)
   {
@@ -105,7 +114,7 @@ PointsCN <- function(i,t,plafond)
   if (is.element("valocot",OptionsCN))
   {
   if (a < AnneeDepartCN) {points_cn_pri <<- points_cn_pri + CotRetTotAnn(i,a)}
-  # ajouté au point privé par défault (décomposition par régime nécessaire?)
+  # ajoute au point prive par default (decomposition par regime necessaire?)
   }
 
 
@@ -133,7 +142,7 @@ PointsCN <- function(i,t,plafond)
 if ((statut[i,a]== chomeurCN) & (!(is.element("noassimilcn",OptionsCN))))
 {
 # print(c("chom",a))
-# Assiette de cotisation: dernier salaire ou SMIC, plafonné à 4 SMIC.   
+# Assiette de cotisation: dernier salaire ou SMIC, plafonne a�4 SMIC.   
 liste <- which(salaire[i,1:(a-1)]>0)
 salref<- salaire[i,liste[length(liste)]]  
 salref <- min(max(salref,SMIC[a]),4*SMIC[a])

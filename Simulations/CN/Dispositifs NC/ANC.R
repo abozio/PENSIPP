@@ -22,6 +22,8 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsCN.R"          
 
 ageref      <- numeric(taille_max)
 pliq_       <- matrix(nrow=taille_max,ncol=7)
+pliq_rg       <- matrix(nrow=taille_max,ncol=7)
+pliq_fp       <- matrix(nrow=taille_max,ncol=7)
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
@@ -30,7 +32,10 @@ liquidants_fp <- numeric(taille_max)
 liquidants_rg <- numeric(taille_max)
 liquidants_in <- numeric(taille_max)
 liquidants_po <- numeric(taille_max)
-
+mc <-      numeric(taille_max) 
+mincont <-      numeric(taille_max) 
+minga <-      numeric(taille_max) 
+mg <-      numeric(taille_max) 
 
 
 MSAL        <- matrix(nrow=7,ncol=200)    # Masse salariale par année
@@ -46,6 +51,7 @@ W           <- 2047.501
 cibletaux<-numeric(taille_max)
 cot<-numeric(taille_max)
 
+# Modification valeur mico. 
 
 
 #### Début de la simulation ####
@@ -62,15 +68,23 @@ for (sc in c(1,2,3,4,5,6,7))
   # Reinitialisation variables
   source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R")) )
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
-  setwd ( (paste0(cheminsource,"Simulations/CN"                                    )) )
+#  setwd ( (paste0(cheminsource,"Simulations/CN"                                    )) )
   
 
-  if (sc==2) {UseOpt(c("nobonif"))}
-  if (sc==3) {UseOpt(c("nobonif","nomda"))}
-  if (sc==4) {UseOpt(c("nobonif","nomda","noavpf"))}
-  if (sc==5) {UseOpt(c("nobonif","nomda","noavpf","noassimil"))}
-  if (sc==6) {UseOpt(c("nobonif","nomda","noavpf","noassimil","noptsgratuits"))}
-  if (sc==7) {UseOpt(c("nobonif","nomda","noavpf","noassimil","noptsgratuits","nomc","nomg"))}
+# if (sc==2) {UseOpt(c("nobonif"))}
+# if (sc==3) {UseOpt(c("nobonif","nomda"))}
+# if (sc==4) {UseOpt(c("nobonif","nomda","noavpf"))}
+# if (sc==5) {UseOpt(c("nobonif","nomda","noavpf","noassimil"))}
+# if (sc==6) {UseOpt(c("nobonif","nomda","noavpf","noassimil","noptsgratuits"))}
+# if (sc==7) {UseOpt(c("nobonif","nomda","noavpf","noassimil","noptsgratuits","nomc","nomg"))}
+
+  if (sc==2) {UseOpt(c("nomc","nomg"))}
+  if (sc==3) {UseOpt(c("nomc","nomg","nobonif"))}
+  if (sc==4) {UseOpt(c("nomc","nomg","nobonif","nomda"))}
+  if (sc==5) {UseOpt(c("nomc","nomg","nobonif","nomda","noavpf"))}
+  if (sc==6) {UseOpt(c("nomc","nomg","nobonif","nomda","noavpf","noassimil"))}
+  if (sc==7) {UseOpt(c("nomc","nomg","nobonif","nomda","noavpf","noassimil","noptsgratuits"))}
+  
   
   for (t in 80:160)   # Début boucle temporelle
   {
@@ -101,7 +115,16 @@ for (sc in c(1,2,3,4,5,6,7))
         if (t_liq[i]==t)
         {
           pliq_[i,sc] <- pension[i]
-          if (sc==1) {ageref[i] <- t-t_naiss[i]}
+          pliq_rg[i,sc] <- pension_rg[i]
+          pliq_fp[i,sc] <- pension_fp[i]
+          if (sc==1) 
+          {
+            ageref[i] <- t-t_naiss[i]
+            mc[i] <- indic_mc[i]
+            mg[i] <- indic_mg[i]
+            mincont[i]<-min_cont
+            minga[i]<-min_garanti
+          }
         }
       } 
       
@@ -114,10 +137,10 @@ for (sc in c(1,2,3,4,5,6,7))
     
     if (sc ==1)
     {
-      liquidants     <- which(t_liq>=115 & t_liq <= 150)
-      liquidants_rg  <- which(t_liq>=115 & t_liq <= 150 & pension_rg>0 & pension_fp==0 & pension_in==0)
-      liquidants_fp  <- which(t_liq>=115 & t_liq <= 150 & pension_fp>.75*pension)
-      liquidants_in  <- which(t_liq>=115 & t_liq <= 150 & pension_in>.75*pension)
+      liquidants     <- which(t_liq>=105 & t_liq <= 150)
+      liquidants_rg  <- which(t_liq>=105 & t_liq <= 150 & pension_rg>0 & pension_fp==0 & pension_in==0)
+      liquidants_fp  <- which(t_liq>=105 & t_liq <= 150 & pension_fp>.75*pension)
+      liquidants_in  <- which(t_liq>=105 & t_liq <= 150 & pension_in>.75*pension)
       liquidants_po  <- setdiff(liquidants,union(liquidants_rg,union(liquidants_fp,liquidants_in)))
     }
     
@@ -144,8 +167,9 @@ for (sc in c(1,2,3,4,5,6,7))
 
 
 #### Sorties ####
-graph_compar(MPENS       ,115,159,"Masse des pensions ")
-graph_compar(PENREL      ,115,159,"Ratio pension/salaire")
+#graph_compar(MPENS       ,115,159,"Masse des pensions ")
+#graph_compar(PENREL      ,115,159,"Ratio pension/salaire")
+#graph_compar(MPENLIQ      ,115,159,"Ratio pension/salaire")
 
 
-save.image("~/Desktop/PENSIPP 0.1/Simulations/CN/Dispositifs NC/ANC.RData")
+save.image((paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_2.RData"))

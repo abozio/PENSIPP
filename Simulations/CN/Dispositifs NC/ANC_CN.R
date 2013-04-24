@@ -9,7 +9,7 @@ t0  <- Sys.time()
 #### Chargement des programmes source ####
 
 # Déclaration du chemin pour les fichiers sources
-cheminsource <- "D:/Github/PENSIPP/"
+cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsMS.R"           )) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsPensIPP.R"      )) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsLeg.R"          )) )
@@ -22,6 +22,9 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsCN.R"          
 ageref      <- numeric(taille_max)
 pliq_       <- matrix(nrow=taille_max,ncol=7)
 points_nc   <- matrix(nrow=taille_max,ncol=7)
+points_pri   <- matrix(nrow=taille_max,ncol=7)
+pension_nc_liq<- matrix(nrow=taille_max,ncol=7)
+
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
@@ -65,12 +68,27 @@ for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
   source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R")) )
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
   setwd ( (paste0(cheminsource,"Simulations/CN"                                    )) )
+
+  #   if (sc==2) {UseOptCN(c("valocot"))}
+#   if (sc==3) {UseOptCN(c("valocot","nobonifcn"))}
+#   if (sc==4) {UseOptCN(c("valocot","nobonifcn","nomdacn"))}
+#   if (sc==5) {UseOptCN(c("valocot","nobonifcn","nomdacn","noavpfcn"))}
+#   if (sc==6) {UseOptCN(c("valocot","nobonifcn","nomdacn","noavpfcn","noassimilcn"))}
+#   if (sc==7) {UseOptCN(c("valocot","nobonifcn","nomdacn","noavpfcn","noassimilcn","nomccn"))}
+   
   if (sc==2) {UseOptCN(c("valocot"))}
-  if (sc==3) {UseOptCN(c("valocot","nobonifcn"))}
-  if (sc==4) {UseOptCN(c("valocot","nobonifcn","nomdacn"))}
-  if (sc==5) {UseOptCN(c("valocot","nobonifcn","nomdacn","noavpfcn"))}
-  if (sc==6) {UseOptCN(c("valocot","nobonifcn","nomdacn","noavpfcn","noassimilcn"))}
-  if (sc==7) {UseOptCN(c("valocot","nobonifcn","nomdacn","noavpfcn","noassimilcn","nomccn"))}
+  if (sc==3) {UseOptCN(c("valocot","nomccn"))}
+  if (sc==4) {UseOptCN(c("valocot","nomccn","nobonifcn"))}
+  if (sc==5) {UseOptCN(c("valocot","nomccn","nobonifcn","nomdacn"))}
+  if (sc==6) {UseOptCN(c("valocot","nomccn","nobonifcn","nomdacn","noavpfcn"))}
+  if (sc==7) {UseOptCN(c("valocot","nomccn","nobonifcn","nomdacn","noavpfcn","noassimilcn"))}
+  
+  if (sc==3) {UseOpt(c("nomg","nomc"))}
+  if (sc==4) {UseOpt(c("nomg","nomc","nobonif"))}
+  if (sc==5) {UseOpt(c("nomg","nomc","nobonif","nomda"))}
+  if (sc==6) {UseOpt(c("nomg","nomc","nobonif","nomda","noavpf"))}
+  if (sc==7) {UseOpt(c("nomg","nomc","nobonif","nomda","noavpf","noassimill","noassimill","noptsgratuits"))}
+  
   
   
   
@@ -98,7 +116,7 @@ for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
     
     if (sc>1 && t==AnneeDepartCN)
     {
-      for (i in 1:55000)
+      for (i in 3993)
       {
         if (ageliq[i]==0)
         {
@@ -109,7 +127,7 @@ for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
     
     
     # Liquidations  
-    for (i in 1:55000)       # Début boucle individuelle
+    for (i in 3993)       # Début boucle individuelle
     {
       Leg <- t
       
@@ -129,9 +147,11 @@ for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
         
         if (t_liq[i]==t)
         { 
-          pliq_[i,sc] <- pension[i]
-          points_nc[i,sc] <- points_cn_nc
-          if (sc==1) {ageref[i] <- t-t_naiss[i]}
+          pliq_[i,sc]          <- pension[i]
+          points_nc[i,sc]      <- points_cn_nc
+          points_pri[i,sc]     <- points_cn_pri
+          pension_nc_liq[i,sc] <- pension_cn_nc[i]
+          if (sc==1) {ageref[i]<- t-t_naiss[i]}
         }
       } 
       
@@ -171,13 +191,17 @@ for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
   
 } # Fin boucle scenarios
 
+pliq_CN   <- pliq_[,2:7]
 MPENS_CN  <- MPENS[2:7,]
 PENREL_CN <- PENREL[2:7,]
+MPENLIQ_CN <- MPENLIQ[2:7,]
 
 #### Sorties ####
 graph_compar(MPENS[2:7,]     ,115,159,"Masse des pensions ")
 graph_compar(PENREL[2:7,]     ,115,159,"Ratio pension/salaire")
-save.image("~/Desktop/PENSIPP 0.1/Simulations/CN/Dispositifs NC/ANC_CN.RData")
+graph_compar(MPENLIQ[2:7]      ,115,159,"")
+
+save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_CN2.RData"))
  
 # plot   (seq(1900+110,1900+159,by=1),MPENS[5,110:159],xlab="Annee", ylab="masse pension",
 #         ylim=c(min(MPENS[5,110:159],na.rm=TRUE),max(MPENS[5,110:159],na.rm=TRUE)),lwd=2,col="orange",type="l")

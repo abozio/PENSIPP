@@ -88,7 +88,8 @@ DurBase <- function (i,t)
   
   
   # Durees par defaut, sans troncations
-  duree_cho   <<- Duree(i,1,t,c(chomeur,chomeurCN))
+#  duree_cho   <<- Duree(i,1,t,c(chomeur,chomeurCN))
+  duree_cho   <<- Duree(i,1,t,c(chomeur))
   duree_PR    <<- Duree(i,1,t,preret)
   duree_emp   <<- Duree(i,1,t,codes_occ)
   duree_empCN <<- Duree(i,1,t,codes_occCN)  
@@ -101,7 +102,8 @@ DurBase <- function (i,t)
   { duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre))}
   else 
   {
-    duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,chomeurCN,preret))
+    duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,preret))
+#    duree_rg  <<- Duree(i,1,t,c(non_cadre,cadre,chomeur,chomeurCN,preret))
   }
   
   if ((t>48) && (t<72)) {duree_rg <<- max(duree_rg,0.5*duree_rg+15)}
@@ -549,18 +551,21 @@ Liq <- function(i,t)
   
 
 # print ("tauxdeliq")
-# print (distance)
+#print (c("distanc",distance))
 # print (DecoteRG)
 # print (taux)
 # print (sam_rg)
 # print (prorat)
 
   # Prise en compte optionnelle du minimum contributif
-  if (!(is.element("nomc",Options)) && (distance>=0) && (pension_rg[i]>0))
+#  if (!(is.element("nomc",Options)) && (distance>=0) && (pension_rg[i]>0))
+  if (!(is.element("nomc",Options))  && (pension_rg[i]>0))
   {
     if (TauxPlein(i,t))
     {
+#      print(c("pensiona",pension_rg[i]))      
       pension_rg[i] <<-  max(pension_rg[i],min_cont)
+ #     print(c("pensionb",pension_rg[i],min_cont))
       if (pension_rg[i]==min_cont)
       {
         indic_mc[i] <<- 1
@@ -681,16 +686,16 @@ Liq <- function(i,t)
   
   ########### Sous module compte notionel ###############################
    if (t>=AnneeDepartCN)
-   {  
-  
+   {    
   pension_cn_pri[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_pri
 #  print (c(pension_cn_pri[i],CoeffConv[t-t_naiss[i]],points_cn_pri))
   pension_cn_fp[i]  <<-CoeffConv[t-t_naiss[i]]*points_cn_fp
   pension_cn_ind[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_ind
-  pension_cn_nc[i] <<-CoeffConv[t-t_naiss[i]]*points_cn_nc
+  pension_cn_nc[i]  <<-CoeffConv[t-t_naiss[i]]*points_cn_nc
   
   #Mico
   if (!(is.element("nomccn",OptionsCN))) {mccn[i] <<-CoeffConv[t-t_naiss[i]]*points_mccn}      
+  
   
    }
   
@@ -702,8 +707,8 @@ Liq <- function(i,t)
   # Sauvegarde la pension sans Min
   pension_nomin[i] <<- pension[i]
   
-  # Minimum vieillesse (provisoire)
-  if ((pension[i]<MinVieil1[t])&(t_naiss[i]+t>=65)){pension[i]<<-MinVieil1[t]} 
+#  # Minimum vieillesse (provisoire)
+#  if ((pension[i]<MinVieil1[t])&(t_naiss[i]+t>=65)){pension[i]<<-MinVieil1[t]} 
   # MicoCN
   pension[i]<<-pension[i]+mccn[i]
   
@@ -755,8 +760,8 @@ Revalo <- function(i,t1,t2)
                   pension_fp[i]+pension_in[i]+
                   pension_cn_pri[i]+pension_cn_fp[i]+  pension_cn_ind[i]
   
-  # Minimum vieillesse (provisoire)
-  if ((pension[i]<MinVieil1[t])& (t_naiss[i]+t>=65)) {pension[i]<<-MinVieil1[t]} 
+#  # Minimum vieillesse (provisoire)
+#  if ((pension[i]<MinVieil1[t])& (t_naiss[i]+t>=65)) {pension[i]<<-MinVieil1[t]} 
   
   rev[i]      <<- rev_rg[i]+rev_ar[i]+rev_ag[i]+
                   rev_fp[i]+rev_in[i]

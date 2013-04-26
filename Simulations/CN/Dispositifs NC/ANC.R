@@ -172,4 +172,4 @@ for (sc in c(1,2,3,4,5,6,7))
 #graph_compar(MPENLIQ      ,115,159,"Ratio pension/salaire")
 
 
-save.image((paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_2.RData"))
+save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC.RData"))

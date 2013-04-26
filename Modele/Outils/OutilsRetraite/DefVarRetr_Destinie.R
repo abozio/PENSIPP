@@ -285,8 +285,8 @@ RevaloCN        <- numeric(200)
 
 
 # Lecture des parametres simples
-setwd((paste0(cheminsource,"Modele/Parametres/Destinie/Parametres Sociaux")))
-buf <- read.csv2("ParamEco.csv",dec=".",sep=";",header=TRUE)
+chem_ParamEco <- paste0(cheminsource,"Modele/Parametres/Destinie/Parametres Sociaux/ParamEco.csv")
+buf <- read.csv2(chem_ParamEco,dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 Prix[t_min:t_max]            <- buf[1:nrow(buf),2]

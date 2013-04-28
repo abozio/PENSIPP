@@ -22,7 +22,7 @@ UseOptCN <- function(liste=c())
   for (i in 1:length(liste))
   {
     OptionsCN[i] <<- tolower(liste[i])
-    if (!(is.element(OptionsCN[i],c("valocot","noassimilcn","noavpfcn","nomdacn","nobonifcn","nomccn")))) 
+    if (!(is.element(OptionsCN[i],c("valocot","discount","noassimilcn","noavpfcn","nomdacn","nobonifcn","nomccn")))) 
     {
       print (paste("Attention : option '",OptionsCN[i],"' inconnue"))
     }
@@ -108,6 +108,21 @@ PointsCN <- function(i,t,plafond)
   # ajouté au point privé par défault (décomposition par régime nécessaire?)
   }
 
+  if (is.element("discount",OptionsCN))
+  {
+  if (a==(AnneeDepartCN+1)) 
+  {
+#  print (c("a",i,a,points_cn_pri))
+  points_cn_pri <<- points_cn_pri*0.9
+  points_cn_ind <<- points_cn_ind*0.9
+  points_cn_fp  <<- points_cn_fp*0.9
+  points_cn_nc  <<- points_cn_nc*0.9
+#  print (c("b",i,a,points_cn_pri))  
+  
+  }
+  }
+      
+      
 
 # PointsCN pour les periodes travaillees.  
 
@@ -152,12 +167,13 @@ if ((statut[i,a]%in% avpfCN) & (!(is.element("noavpfcn",OptionsCN))))
 # MDA (lors d'une naissance a l'annee a)
 if ((sexe[i]==2) &(is.element(a,t_naiss[enf[i,]])) & (!(is.element("nomdacn",OptionsCN))))
 {
-#print(c("mda",a))
+#print(c(1,"mda",a,points_cn_nc))
   # Assiette de cotisation: Moyenne des salaire des années précédentes ou SMIC, plafonne à 4 SMIC., plafonné à 4 SMIC.  
   #liste <- which(is.element(statut[i,1:a],codes_occCN))
  # salref<-min(max(mean(salaire[i,liste]),SMIC[a]),4*SMIC[a])
-  salref <- min(max(salaire[i,(a-1)],SMIC[a]),2*PlafondSS[a])
-  points_cn_nc  <<- points_cn_nc + TauxCotCN[115]*salref
+  salref <- min(max(salaire[i,(a-1)],salaire[i,(a-2)],SMIC[a]),4*PlafondSS[a])
+  points_cn_nc  <<- points_cn_nc + TauxCotCN[115]*salref*2
+#print(c(2,"mda",a,points_cn_nc))
 }  
 
 #print(c(points_cn_nc,a))
@@ -170,7 +186,7 @@ if (!(is.element("nobonifcn",OptionsCN)))
 if (n_enf[i]>2)
 { 
   points_cn_pri<<- 1.10*points_cn_pri 
-  points_cn_fp <<- 1.15*points_cn_fp 
+  points_cn_fp <<- 1.10*points_cn_fp 
   points_cn_ind<<- 1.10*points_cn_ind
   points_cn_nc <<- 1.10*points_cn_nc
 }

@@ -694,8 +694,11 @@ Liq <- function(i,t)
   pension_cn_nc[i]  <<-CoeffConv[t-t_naiss[i]]*points_cn_nc
   
   #Mico
-  if (!(is.element("nomccn",OptionsCN))) {mccn[i] <<-CoeffConv[t-t_naiss[i]]*points_mccn}      
-  
+  if (!(is.element("nomccn",OptionsCN))) 
+  {
+  mccn[i] <<-CoeffConv[t-t_naiss[i]]*points_mccn     
+  pension_cn_nc[i] <<- pension_cn_nc[i] +mccn[i]
+  }
   
    }
   
@@ -709,9 +712,7 @@ Liq <- function(i,t)
   
 #  # Minimum vieillesse (provisoire)
 #  if ((pension[i]<MinVieil1[t])&(t_naiss[i]+t>=65)){pension[i]<<-MinVieil1[t]} 
-  # MicoCN
-  pension[i]<<-pension[i]+mccn[i]
-  
+
   pliq[i]                <<- pension[i]
   ageliq[i]              <<- t-t_naiss[i]
   t_liq[i]               <<- t
@@ -745,6 +746,7 @@ Revalo <- function(i,t1,t2)
     pension_cn_pri[i] <<- pension_cn_pri[i]*RevaloCN[u]
     pension_cn_fp[i]  <<- pension_cn_fp[i]*RevaloCN[u]
     pension_cn_ind[i] <<- pension_cn_ind[i]*RevaloCN[u]
+    pension_cn_nc[i] <<- pension_cn_nc[i]*RevaloCN[u]
   }
   
   # Revalos des regimes complementaires
@@ -758,7 +760,7 @@ Revalo <- function(i,t1,t2)
   # Mises a jour globales
   pension[i]  <<- pension_rg[i]+pension_ar[i]+pension_ag[i]+
                   pension_fp[i]+pension_in[i]+
-                  pension_cn_pri[i]+pension_cn_fp[i]+  pension_cn_ind[i]
+                  pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]+pension_cn_nc[i]
   
 #  # Minimum vieillesse (provisoire)
 #  if ((pension[i]<MinVieil1[t])& (t_naiss[i]+t>=65)) {pension[i]<<-MinVieil1[t]} 

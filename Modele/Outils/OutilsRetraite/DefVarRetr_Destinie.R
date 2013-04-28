@@ -102,6 +102,7 @@ cadreCN     <-  104
 fonct_aCN   <-  105
 fonct_sCN   <-  106
 indepCN     <-  107
+avpfCN      <-  108
 avpf      <-  8
 preret    <-  9
 codes_actCN <- c(102:107)
@@ -156,7 +157,10 @@ pension_in      <- numeric(taille_max)
 pension_cn_pri  <- numeric(taille_max)
 pension_cn_fp   <- numeric(taille_max)
 pension_cn_ind  <- numeric(taille_max)
+pension_cn_nc   <- numeric(taille_max)
+pension_nomin   <- numeric(taille_max)
 pension         <- numeric(taille_max)
+mccn            <- numeric(taille_max)
 cotret          <- numeric(taille_max)
 cotrettot       <- numeric(taille_max)
 rev_rg          <- numeric(taille_max)
@@ -201,6 +205,9 @@ points_agirc    <- 0
 points_cn_pri   <- 0
 points_cn_fp    <- 0
 points_cn_ind   <- 0
+points_cn_nc    <- 0
+points_mccn     <- 0
+txmc            <- 0
 plafond         <- 0
 min_cont        <- 0
 min_garanti     <- 0

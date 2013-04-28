@@ -195,6 +195,7 @@ pliq_CN   <- pliq_[,2:7]
 MPENS_CN  <- MPENS[2:7,]
 PENREL_CN <- PENREL[2:7,]
 MPENLIQ_CN <- MPENLIQ[2:7,]
+RATIOPENS_CN<-
 
 #### Sorties ####
 graph_compar(MPENS[2:7,]     ,115,159,"Masse des pensions ")

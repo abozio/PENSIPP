@@ -170,6 +170,16 @@ for (sc in c(1,2,3,4,5,6,7))
 #graph_compar(MPENS       ,115,159,"Masse des pensions ")
 #graph_compar(PENREL      ,115,159,"Ratio pension/salaire")
 #graph_compar(MPENLIQ      ,115,159,"Ratio pension/salaire")
+par(mar=c(6.1, 3.1, 4.1, 2.1))
+par(xpd=TRUE)
+plot   (seq(2010,2059,by=1),RATIOFIN[1,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.20,0.30),col="grey0",lwd=4,type="l")
+points (seq(2010,2059,by=1),RATIOFIN[7,110:159],lwd=4,col="grey80",type="l")
+title("Graphe : Evolution du ratio retraites/PIB \n Comparaison Système actuel avec ou sans ANC", cex.main = 0.9)
+legend.text <- c("ANC","NO ANC")
+legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80"))
+
 
 
 save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC.RData"))
+save(MPENS,MPENLIQ,RATIOFIN,file=paste0(cheminsource,"Simulations/CN/Dispositifs NC/MasseANC.RData"))
+

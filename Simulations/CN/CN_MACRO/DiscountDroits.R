@@ -203,7 +203,8 @@ save.image(paste0(cheminsource,"Simulations/CN/CNeq2.RData"))
 
 
 #### Sorties ####
-load(paste0(cheminsource,"Simulations/CN/CNeq2.RData"))
+
+load(paste0(cheminsource,"Simulations/CN/CN_MACRO/CNeq2.RData"))
 RATIOPENSM   <- matrix(nrow=4,ncol=200) 
 RATIOFINM   <- matrix(nrow=4,ncol=200) 
 for (t in 110:159){RATIOPENSM[,t]<-(RATIOPENS[,(t-1)]+RATIOPENS[,(t)]+RATIOPENS[,(t+1)])/3}
@@ -226,7 +227,7 @@ title("Graphe 6b : Evolution du ratio retraites/salaires \n(taux 27%, no ANC)", 
 legend.text <- c("Scénario de référénce","CN","CN réduction droits acquis")
 legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80","grey40"))
 
-load(paste0(cheminsource,"Simulations/CN/CNeq.RData"))
+load(paste0(cheminsource,"Simulations/CN/CN_MACRO/CNeq.RData"))
 RATIOPENSM   <- matrix(nrow=4,ncol=200) 
 RATIOFINM   <- matrix(nrow=4,ncol=200) 
 for (t in 110:159){RATIOPENSM[,t]<-(RATIOPENS[,(t-1)]+RATIOPENS[,(t)]+RATIOPENS[,(t+1)])/3}

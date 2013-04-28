@@ -72,9 +72,8 @@ cibletaux<-numeric(taille_max)
 
 #### Début de la simulation ####
 
-load(file=(paste0(cheminsource,"Simulations/CN/ref.RData")))
 #  Rprof(tmp<-tempfile())
-for (sc in c(1,2,3,4))
+for (sc in c(2,3,4))
   
 {
   
@@ -86,6 +85,7 @@ for (sc in c(1,2,3,4))
   duree_liq   <- rep(0,taille_max)
   points_cn   <- rep(0,taille_max)
   pension_cn  <- rep(0,taille_max)
+  plafond<-8 
   
   for (t in 60:160)   # Début boucle temporelle
   {
@@ -104,7 +104,7 @@ for (sc in c(1,2,3,4))
     
     if (sc>1 && t==AnneeDepartCN)
     {
-      for (i in 1:10)
+      for (i in 1:55000)
       {
         if (ageliq[i]==0)
         {
@@ -116,14 +116,14 @@ for (sc in c(1,2,3,4))
     
     
     # Liquidations  
-    for (i in 1:10)       # Début boucle individuelle
+    for (i in 1:55000)       # Début boucle individuelle
     {
       
       # Liquidation
       
       if ((t-t_naiss[i]>=55) && (ageliq[i]==0))
       {
-        if (sc>1 && t>=AnneeDepartCN)
+        if (sc>1)
         {
           Leg <- t
           UseLeg(Leg,t_naiss[i])
@@ -222,4 +222,14 @@ points (seq(2010,2059,by=1),RATIOPENS[2,110:159],lwd=4,col="grey80",type="l")
 title("Graphe 4 : Evolution du ratio retraites/PIB \n Comparaison Système actuel - Comptes notionnels \n(23% + ANC)", cex.main = 0.9)
 legend.text <- c("Régime actuel","Comptes notionnels")
 legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80"))
+
+par(mar=c(6.1, 3.1, 4.1, 2.1))
+par(xpd=TRUE)
+plot   (seq(2010,2059,by=1),RATIOPENS[2,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.11,0.15),col="grey0",lwd=4,type="l")
+points (seq(2010,2059,by=1),RATIOPENS[3,110:159],lwd=4,col="grey40",type="l")
+points (seq(2010,2059,by=1),RATIOPENS[4,110:159],lwd=4,col="grey80",type="l")
+title("Graphe 3 : Régime CN \nEvolution du ratio retraite/PIB \nVariantes de scénario de croissance", cex.main = 0.9)
+legend.text<-c("Scenario A (g=2%)","Scenario B (g=1.5%)","Scenario C (g=1%)")
+legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey80","grey0","grey40"))
+
 

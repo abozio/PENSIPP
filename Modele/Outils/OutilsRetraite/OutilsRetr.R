@@ -1,41 +1,39 @@
+###################################################################################################
 # 
 #                                   OutilsRetr : PROGRAMMES DE SIMULATION DES RETRAITES
 # 
-
 # 
 # I. Programmes precisant les hypotheses de simulation des retraites
 #     UseOpt     : choix des options generales de simulation
-
 # 
 # II. Fonctions servant a calculer les variables intermediaires 
 #
 #    DurBase     : calcul des durees de base (durees cotisations et AVPF)
 #    DurMajo     : calcul des durees majorees
 #    SalBase     : calcul des SAM et du salaire de reference FP
-#    Points      : calcul des decomptes de points ARRCO, AGIRC et comptes
-#                  notionnels
+#    Points      : calcul des decomptes de points ARRCO, AGIRC et comptes notionnels                  
 #    MinCont     : calcul du minimum contributif
 #    MinGaranti  : calcul du minimum garanti
 # 
-# III. Fonctions testant les conditions d'acces a la retraite :
+# III. Fonctions testant les conditions d'acces a la retraite 
 # 
 #    AgeTrim     : retourne un age trimestrialise
 #    AgeMin      : indique si l'individu a atteint l'age minimum d'ouverture des droits
-#    AgeMax      : indique si l'individu a depasse l'age de mise ?? la retraite d'office
+#    AgeMax      : indique si l'individu a depasse l'age de mise a la retraite d'office
 #    TauxPlein   : indique si l'individu a atteint les conditions du taux plein
 # 
 # IV. Des programmes d'initialisation ou de projection des pensions.
 # 
-#    Liq         : calcul droits complets ?? la liquidation
+#    Liq         : calcul droits complets a la liquidation
 #    Revalo      : revalorisation de l'ensemble des droits (y.c. reversion)
 #    SimDir      : initialisation ou projection des droits directs
 #
 # V. Calcul d'indicateurs derives
 #
-#    CotRet      : calcule les cotisations retraite sur salaires sur une année
-#    CotRetTot   : calcule l'ensemble des cotisation retraite sur salaire versées 
-
-
+#    CotRet      : calcule les cotisations retraite sur salaires sur une annee
+#    CotRetTot   : calcule l'ensemble des cotisation retraite sur salaire versees 
+#
+###################################################################################################
 
 
 
@@ -47,7 +45,8 @@ source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsLeg.R")) )
 
 
 
-############# Fonction UseOpt
+# I. Programmes precisant les hypotheses de simulation des retraites-------------
+
 UseOpt <- function(liste=c())
 {
   Options <<- c()
@@ -62,18 +61,20 @@ UseOpt <- function(liste=c())
 }
 
 
+# II. Fonctions servant a calculer les variables intermediaires ----------
 
-###### Duree
 # -> Fonction duree : calcule le nombre d'annees passees par un individu donne, dans un ensemble 
 # d'etats entre deux dates
 # Exemple d'appel
 #  annuites[i] <- duree(i,110,150,codes_occ)
+
+# Duree
 Duree <- function(i,t1,t2,valeurs)
 {
    return (sum(is.element(statut[i,t1:t2],valeurs)))
 }
 
-############ DurBase
+# DurBase
 DurBase <- function (i,t)
 {
   
@@ -173,7 +174,7 @@ DurMajo <- function(i,t)
   if ((sexe[i]==2) && (!(is.element("nomda",Options))))
 
   {
-    # Calcul du nombre d'enfants avec r??gles specifiques pour le public
+    # Calcul du nombre d'enfants avec regles specifiques pour le public
 #print (c(i,enf[i,]))
 
     for (e in 1:n_enf[i])
@@ -242,8 +243,8 @@ SalBase <- function(i,t)
 }
 
 # -> Fonction Points
-# Calcule les points ARRCO et AGIRC acquis par l'individu i ?? la date t. Les variables
-# globales mises ?? jour sont points_arrco et points_agirc
+# Calcule les points ARRCO et AGIRC acquis par l'individu i a la date t. Les variables
+# globales mises a jour sont points_arrco et points_agirc
 Points <- function(i,t)
 {
    
@@ -259,8 +260,8 @@ Points <- function(i,t)
  sal_C        <- part(salaire[i,1:t],4*PlafondSS[1:t],8*PlafondSS[1:t],which(statut[i,1:t]==cadre))
 
  
- # Points gratuits pour p?riodes de ch?mage.
- # NB: implique que les statuts de chomage indemnis?s et salchomref soient d?finis (dans Genebio ou en d?but de programme?)
+ # Points gratuits pour p?riodes de chomage.
+ # NB: implique que les statuts de chomage indemnises et salchomref soient definis (dans Genebio ou en debut de programme?)
  if (!(is.element("noptsgratuits",Options)))
  {
  #  print("PtsGratuits")
@@ -310,7 +311,7 @@ MinCont <- function(i,t)
     }
     else if (t>=104)
     {
-      # Cas d'un monopensionne RG ou d'un poly ??? carri??re incompl??te : r??gle simple
+      # Cas d'un monopensionne RG ou d'un polypensionne a carriere incomplete : regle simple
       if ((duree_rg_maj==duree_tot_maj) || (duree_tot_maj<DureeCibRG))
       {
         min_cont <<- Mincont1[t]*min(1,(duree_rg_maj/DureeProratRG))+
@@ -370,7 +371,9 @@ MinGaranti <- function(i,t)
   min_garanti <<- coef*PointFP[t]/100;
 }
 
-############# AGETRIM
+# III. Fonctions testant les conditions d'acces a la retraite ---------
+
+# AGETRIM
 AgeTrim <- function(i,t)
 {
   return (t-t_naiss[i]+trim_naiss[i])
@@ -489,7 +492,7 @@ TauxPlein <- function (i,t)
   }
 }
 
-
+# IV. Des programmes d'initialisation ou de projection des pensions----------
 
 ############ Fonction Liq
 Liq <- function(i,t)
@@ -865,7 +868,7 @@ SimDir <- function(i,t,comportement="TP",cible=c())
   }
 }
 
-##################################### V. Calcul d'indicateurs derives
+# V. Calcul d'indicateurs derives----------------------
 
 
 ########Fonction CotRetSal 

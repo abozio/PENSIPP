@@ -1,60 +1,62 @@
-#####################################   OutilsLeg : Les paramètres du système de retraite (fonction UseLeg)  ############################
-
-
-# La fonction UseLeg initialise les paramètres du système de retraite qui varient selon 
-#  (i) la législation 
-#  (ii) l'individu (par exemple son année de naissance) 
-# Il s'agit des paramètres que DefVarRetr ne lit pas directement dans les paramètres retraite (qui sont généraux).
-# Comme les paramètres de calcul de la retraite dépendront en général de l'individu, à année donnée, elle doit
-# être appelée à l'intérieur de la boucle individuelle de calcul des pensions.
+########################################################################################################
+#
+#                  OutilsLeg : Les parametres du systeme de retraite (fonction UseLeg)
+#
+#
+# La fonction UseLeg initialise les parametres du systeme de retraite qui varient selon 
+#  (i) la legislation 
+#  (ii) l'individu (par exemple son annee de naissance) 
+# Il s'agit des parametres que DefVarRetr ne lit pas directement dans les parametres retraite (qui sont
+# generaux). Comme les parametres de calcul de la retraite dependront en general de l'individu, a annee 
+# donnee, elle doit etre appelee a l'interieur de la boucle individuelle de calcul des pensions.
 # 
-# On rappelle que ces paramètres sont :
+# On rappelle que ces parametres sont :
 #   
-# DureeCibRG      : Durée cible régime général
-# DureeProratRG   : Durée de proratisation du régime général
-# DureeCalcSAM    : Nombre d'années pour calcul du SAM dans le RG
-# TauxPleinRG     : Taux plein du régime général
-# DecoteRG        : Coefficient de décote du régime général (par année d'écart au taux plein)
-# SurcoteRG1      : Coefficient de surcote du régime général, 1ere année
-# SurcoteRG2      : Coefficient de surcote du régime général, 2eme année
-# SurcoteRG3      : Coefficient de surcote du régime général, 3eme année
+# DureeCibRG      : Duree cible regime general
+# DureeProratRG   : Duree de proratisation du regime general
+# DureeCalcSAM    : Nombre d'annees pour calcul du SAM dans le RG
+# TauxPleinRG     : Taux plein du regime general
+# DecoteRG        : Coefficient de decote du regime general (par annee d'ecart au taux plein)
+# SurcoteRG1      : Coefficient de surcote du regime general, 1ere annee
+# SurcoteRG2      : Coefficient de surcote du regime general, 2eme annee
+# SurcoteRG3      : Coefficient de surcote du regime general, 3eme annee
 # TauxRGMax       : Taux maximal de la pension RG
 # DureeCibFP      : Duree cible de la fonction publique
 # DecoteFP        : Decote fonction publique
 # SurcoteFP       : Surcote fonction publique
-# AgeAnnDecFP     : Age d'annulation de la décote fonction publique.
+# AgeAnnDecFP     : Age d'annulation de la decote fonction publique.
 # 
-# La fonction UseLeg fixe les valeurs de ces différents paramètres en fonction de l'année et
-# de la génération. Par exemple :
+# La fonction UseLeg fixe les valeurs de ces differents parametres en fonction de l'annee et
+# de la generation. Par exemple :
 #   
-#   UseLeg(t,anaiss[i]);
+#   UseLeg(t,t_naiss[i]);
 # 
-# signifie que, jusqu'au prochain appel de UseLeg, on va utiliser les paramètres
-# que prévoyait la législation de l'année t pour les individus nés en anaiss[i].
+# signifie que, jusqu'au prochain appel de UseLeg, on va utiliser les parametres
+# que prevoyait la legislation de l'annee t pour les individus nes en t_naiss[i].
 # 
-# Cette fonction permet de simuler d'autres règles de calcul des droits que celles
-# s'appliquant ou devant s'appliquer à l'individu i.
+# Cette fonction permet de simuler d'autres regles de calcul des droits que celles
+# s'appliquant ou devant s'appliquer a l'individu i.
 # 
-# UseLeg(1992,anaiss[i]);
+# UseLeg(1992,t_naiss[i]);
 # UseLeg(1992,1942);
 # 
-# mettent en oeuvre le barème que prévoyait la législation de 1992 pour les
-# individus nés en anaiss[i] ou pour la génération 1942. Si ceci ne suffit pas
-# à décrire le scénario souhaité, il est toujours possible de modifier à la main
-# un ou plusieurs paramètres après ces appels de UseLeg, comme on a vu pouvoir
-# le faire pour les paramètres lus dans ParamSociaux.xls.
+# mettent en oeuvre le bareme que prevoyait la legislation de 1992 pour les
+# individus nes en t_naiss[i] ou pour la g?n?ration 1942. Si ceci ne suffit pas
+# ? d?crire le sc?nario souhait?, il est toujours possible de modifier ? la main
+# un ou plusieurs param?tres apr?s ces appels de UseLeg, comme on a vu pouvoir
+# le faire pour les param?tres lus dans ParamSociaux.xls.
 # 
 # On notera que, dans ces appels, on utilise le millesime complet. En fait, pour
-# pouvoir utiliser les mêmes compteurs de date que ceux qui indicent les séries
-# temporelles le programme accepte aussi les dates ramenées à l'origine 1900, i.e.
-# on aurait pu écrire :
+# pouvoir utiliser les m?mes compteurs de date que ceux qui indicent les s?ries
+# temporelles le programme accepte aussi les dates ramen?es ? l'origine 1900, i.e.
+# on aurait pu ?crire :
 # 
-# UseLeg(103,anaiss[i]);
+# UseLeg(103,t_naiss[i]);
 # 
-# C'est ce qui était implicitement fait dans le premier exemple d'appel si t
-# était une variable de boucle comprise entre 103 et 150.
+# C'est ce qui ?tait implicitement fait dans le premier exemple d'appel si t
+# ?tait une variable de boucle comprise entre 103 et 150.
 # 
-# 
+############################################################################################# 
 
 
 
@@ -132,28 +134,28 @@ UseLeg <- function(Leg,g)
   nenf   <<-0
   a      <<-15
   
-  while ( (a<=min((t-anaiss[i]-1),AgeMinFP)) && is.na(AnOuvDroitFP) )  #  while ((a<=Min((t-anaiss[i]-1),(int(Arr(1+moisnaiss[i]+12*AgeMinFP)/12)-1))) && (AnOuvDroitFP==NA))) )
+  while ( (a<=min((t-t_naiss[i]-1),AgeMinFP)) && is.na(AnOuvDroitFP) )  #  while ((a<=Min((t-t_naiss[i]-1),(int(Arr(1+moisnaiss[i]+12*AgeMinFP)/12)-1))) && (AnOuvDroitFP==NA))) )
   {
     
-    if  (statut[i,(anaiss[i]+a)]%in% fonct_a)                             {durfpa  <<- durfpa +1}
+    if  (statut[i,(t_naiss[i]+a)]%in% fonct_a)                             {durfpa  <<- durfpa +1}
     if  (statut[i,a] %in% c(fonct_a,fonct_s))                             {durfp   <<- durfp +1}
     
     #  print (c("durfpa", durfpa))
-    if ((durfpa>=DureeMinFPA) && (a>=54) )                              {AnOuvDroitFP <<- anaiss[i]+a+1 }
+    if ((durfpa>=DureeMinFPA) && (a>=54) )                              {AnOuvDroitFP <<- t_naiss[i]+a+1 }
     if (Leg<2010)
     {
-      if ((enf[i,3]>0) && (anaiss[enf[i,3]]<=anaiss[i]+a) &&                     #MODIF SR : (enf[i][3]>0) par reconnu, changment avec NA).        
-        (durfp>=DureeMinFP) && (sexe[i] == 2))                {AnOuvDroitFP <<- anaiss[i]+a+1 }
+      if ((enf[i,3]>0) && (t_naiss[enf[i,3]]<=t_naiss[i]+a) &&                     #MODIF SR : (enf[i][3]>0) par reconnu, changment avec NA).        
+        (durfp>=DureeMinFP) && (sexe[i] == 2))                {AnOuvDroitFP <<- t_naiss[i]+a+1 }
     }
     else
     {
-      if ( (enf[i,3]>0) && (anaiss[enf[i,3]]<=anaiss[i]+a) &&
-        (durfp>=15) && (sexe[i] == 2) && (anaiss[i]+a<2012))  {AnOuvDroitFP <<- anaiss[i]+a+1 }
+      if ( (enf[i,3]>0) && (t_naiss[enf[i,3]]<=t_naiss[i]+a) &&
+        (durfp>=15) && (sexe[i] == 2) && (t_naiss[i]+a<2012))  {AnOuvDroitFP <<- t_naiss[i]+a+1 }
     }
     a <- a+1
   }
-  if ( !is.na(AnOuvDroitFP)  && (AnOuvDroitFP-anaiss[i]<AgeMinFP))       { AgeMinFP     <<- AnOuvDroitFP-anaiss[i]}
-  else                                                                   { AnOuvDroitFP <<- AgeMinFP+anaiss[i]    }
+  if ( !is.na(AnOuvDroitFP)  && (AnOuvDroitFP-t_naiss[i]<AgeMinFP))       { AgeMinFP     <<- AnOuvDroitFP-t_naiss[i]}
+  else                                                                   { AnOuvDroitFP <<- AgeMinFP+t_naiss[i]    }
   
   
   # Param??tres dependant de l'age et/ou de la generation
@@ -349,7 +351,7 @@ UseLeg <- function(Leg,g)
       AgeMinFP  <<- affn(g,c(1955,1961),c(55,57))
       if ((g==1951) && (trim_naiss[i]<=0.5))       {   AgeMinFP    <<- 55  }
       if (Leg>=2011)          { AgeMinFP <<- AgeMinFP + affn(g,c(1956,1960,1961),c(0,4/12,0))  }  #acceleration de la reforme, cf. PLFSS 2012 rectifie
-      AnOuvDroitFP <<-anaiss[i]+AgeMinFP                                                    #AnOuvDroitFP = int(anaiss[i]+moisnaiss[i]/12+ageouvdroitfp)
+      AnOuvDroitFP <<-t_naiss[i]+AgeMinFP                                                    #AnOuvDroitFP = int(t_naiss[i]+moisnaiss[i]/12+ageouvdroitfp)
       AgeAnnDecFP <<- AgeMinFP + affn(AnOuvDroitFP,c(105,106,108,120),c(0,1,2,5))
       DecoteFP    <<- affn(AnOuvDroitFP,c(105,115),c(0,0.05))
       DureeCibFP     <<- affn(g,c(1933,1943,1948,1949,1950,1951,1952,1953 ,1954 ,1955,1957,1958 ),
@@ -365,7 +367,7 @@ UseLeg <- function(Leg,g)
       ageouvdroitfp  <<- affn(g,c(1950,1956),c(60,62))
       if ((g==1951) && (trim_naiss[i]<=0.5))        {   ageouvdroitfp    = 60  }
       if (Leg>=2011)                                { ageouvdroitfp <<- ageouvdroitfp + affn(g,c(1951,1955,1956,),c(0,4/12,0))  }  #acceleration de la reforme, cf. PLFSS 2012 rectifie
-      AnOuvDroitFP   <<- anaiss[i]+AgeMinFP                                                    #AnOuvDroitFP = int(anaiss[i]+moisnaiss[i]/12+ageouvdroitfp)
+      AnOuvDroitFP   <<- t_naiss[i]+AgeMinFP                                                    #AnOuvDroitFP = int(t_naiss[i]+moisnaiss[i]/12+ageouvdroitfp)
       AgeAnnDecFP    <<- 60 + affn(AnOuvDroitFP,c(105,106,108,120),c(0,1,2,5))
       DecoteFP       <<- affn(AnOuvDroitFP,c(105,115),c(0,0.05))
       DureeCibFP     <<- affn(g,c(1933,1943,1948,1949,1950,1951,1952,1953 ,1954 ,1955,1957,1958 ),
@@ -379,7 +381,7 @@ UseLeg <- function(Leg,g)
       AgeMinFP  <<- affn(g,c(1950,1956),c(60,62))
       if ((g==1951) && (trim_naiss<=0.5))      {   AgeMinFP    = 60  }
       if (Leg>=2011)          { AgeMinFP <<- AgeMinFP + affn(g,c(1951,1955,1956),c(0,4/12,0))  }  #acceleration de la reforme, cf. PLFSS 2012 rectifie
-      AnOuvDroitFP   <<- anaiss[i]+AgeMinFP                                                  #AnOuvDroitFP = int(anaiss[i]+moisnaiss[i]/12+AgeMinFP)
+      AnOuvDroitFP   <<- t_naiss[i]+AgeMinFP                                                  #AnOuvDroitFP = int(t_naiss[i]+moisnaiss[i]/12+AgeMinFP)
       AgeAnnDecFP    <<-AgeMinFP + affn(AnOuvDroitFP,c(105,106,108,120),c(0,1,2,5))
       DecoteFP       <<- affn(AnOuvDroitFP,c(105,115),c(0,0.05))
       DureeCibFP     <<- affn(g,c(1933,1943,1948,1949,1950,1951,1952,1953 ,1954 ,1955,1957,1958 ),
@@ -434,8 +436,8 @@ UseLeg <- function(Leg,g)
       DureeValCibDRA  <<- c(DureeCibRG+2,DureeCibRG+2,DureeCibRG+2,DureeCibRG+2, DureeCibRG)
       DureeCotCibDRA  <<- c(DureeCibRG+2,DureeCibRG+1,DureeCibRG,DureeCibRG,DureeCibRG)
       DebActCibDRA    <<- c(16,16,17,18,20)
-      if (112+10/12>anaiss[i]+moisnaiss[i]/12+60)  { AgeDRA <<- AgeDRA + c(0,0,0,0,(112+10/12-(anaiss[i]+moisnaiss[i]/12+60))-99) } 
-      else                                         { AgeDRA <<- AgeDRA + c(0,0,0,0,(112+10/12-(anaiss[i]+moisnaiss[i]/12+60))-99)}     
+      if (112+10/12>t_naiss[i]+moisnaiss[i]/12+60)  { AgeDRA <<- AgeDRA + c(0,0,0,0,(112+10/12-(t_naiss[i]+moisnaiss[i]/12+60))-99) } 
+      else                                         { AgeDRA <<- AgeDRA + c(0,0,0,0,(112+10/12-(t_naiss[i]+moisnaiss[i]/12+60))-99)}     
     }
     
   }

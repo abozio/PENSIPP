@@ -1,8 +1,7 @@
-
-
-#####################################   DefVarRetr : INITIALISATION DES VARIABLES DE SIMULATION DE RETRAITE   ############################
-# 
-
+#################################################################################################
+#
+#            DefVarRetr : INITIALISATION DES VARIABLES DE SIMULATION DE RETRAITE 
+#
 # PLAN: 
 #     VUE D'ENSEMBLE
 # I.  VARIABLES INDIVIDUELLES D'INPUTS
@@ -66,7 +65,7 @@
 # des variables age et t_naiss qui sont inconnues de OutilsBase.
 
 
-
+# I.  VARIABLES INDIVIDUELLES D'INPUTS----------
 
 # Parametres generaux de la microsimulation
 taille_max   <- 110000
@@ -146,7 +145,7 @@ PIB            <- numeric(180)
 salrefchom <- matrix (0     ,nrow=taille_max,ncol=t_fin     )
 chomind    <- matrix (0     ,nrow=taille_max,ncol=t_fin     )
 
-
+# II. VARIABLES INDIVIDUELLES D'OUTPUTS-----------------
 
 # Variables retraite individuelles principales
 pension_rg      <- numeric(taille_max)

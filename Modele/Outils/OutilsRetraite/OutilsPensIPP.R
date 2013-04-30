@@ -1,30 +1,30 @@
-#####################################################################################################
-#                         Bibliotheque d'utilitaires generaux PENSIPP
-# 
-# 
-# Cette bibliotheque contient
-# B) des fonctions calculant diverses probabilites d'evenements demographiques
-# C) des procedures de gestion des liens familiaux
-# D) des procedures de tabulation
-# E) des fonctions d'entree-sortie'
-#
-# Quelques conventions :
-# - R demarrant l'indiçage des tableaux par 1, l'age est egalement compte a partir de 1. Autrement dit,
-#   si on se situe au 1/1 d'une annee donnee, il s'agira de l'age atteint dans l'annee.
-# - Toutes les dates sont comptees par rapport a l'annee 1900, par exemple annais[i]=90 pour un 
-#   individu ne en 1990, statut[i,110] pour son statut en 2010. De m??me, pour les series temporelles,
-#   x[107] correspond a une valeur de l'annee 2007 et la premiere position utilisable est donc l'annee 
-#   1901
-# - Lorsqu'un apparente n'est pas defini, son ID est a zero
-# - Codes particuliers 
-#   conjoint : -3=veuf, -2=separe, -1=celibataire, >0=id du conjoint
-#   statut   : -2=non vivant, -1=vivant hors territoire, >0=statuts d'activite des presents
-
+######################################################################################################
+#                         Bibliotheque d'utilitaires generaux PENSIPP                                #
+#                                                                                                    #
+#                                                                                                    #
+# Cette bibliotheque contient                                                                        #
+# B) des fonctions calculant diverses probabilites d'evenements demographiques                       #
+# C) des procedures de gestion des liens familiaux                                                   #
+# D) des procedures de tabulation                                                                    #
+# E) des fonctions d'entree-sortie'                                                                  #
+#                                                                                                    #
+# Quelques conventions :                                                                             #
+# - R demarrant l'indicage des tableaux par 1, l'age est egalement compte a partir de 1. Autrement   #
+#   dit, si on se situe au 1/1 d'une annee donnee, il s'agira de l'age atteint dans l'annee.         #
+# - Toutes les dates sont comptees par rapport a l'annee 1900, par exemple t_naiss[i]=90 pour un     #
+#   individu ne en 1990, statut[i,110] pour son statut en 2010. De meme, pour les series temporelles,#
+#   x[107] correspond a une valeur de l'annee 2007 et la premiere position utilisable est donc       #
+#   l'annee 1901.                                                                                    #
+# - Lorsqu'un apparente n'est pas defini, son ID est a zero                                          #
+# - Codes particuliers                                                                               #
+#   conjoint : -3=veuf, -2=separe, -1=celibataire, >0=id du conjoint                                 #
+#   statut   : -2=non vivant, -1=vivant hors territoire, >0=statuts d'activite des presents          #
+#                                                                                                    #
 ######################################################################################################
 
 
-########################################################################################
-#A ) PROBA D'EVENEMENTS DEMOGRAPHIQUES
+
+#A ) PROBA D'EVENEMENTS DEMOGRAPHIQUES--------
 
 proba_union <- function(i,t)
 # Coefficients d'apres Duee (2006)
@@ -87,7 +87,7 @@ proba_separ <- function(i,t)
 
 proba_naissance <- function(i,t)
   # A ce stade, fonction se contentant de controler le fait d'etre une femme en couple et 
-  # le fait d'avoir un nombre d'enfants inf???rieur au nombre maximum g???r??? par le programme. 
+  # le fait d'avoir un nombre d'enfants inferieur au nombre maximum gere par le programme. 
 {
   p <- 0
   if (statut[i,t]>0)
@@ -104,8 +104,7 @@ proba_naissance <- function(i,t)
   return (p)
 }
 
-#######################################################################################################
-# B) FONCTIONS DE GESTION DES LIENS FAMILIAUX
+# B) FONCTIONS DE GESTION DES LIENS FAMILIAUX----------
 
 # -> liste_enf : retourne la liste des id des enfants de l'individu i : par defaut l'ensemble
 #                des ces enfants, ou seulement les enfants encore en vie (option="vivants")
@@ -127,7 +126,7 @@ liste_enf  <- function(i,t,option="tous")
   return (liste)
 }
 
-# -> nb_enf : retourne le nombre d'enfants de l'individu i : par defaut l'ensemble
+# -> nb_enf : retourne le nombre d'enfants de l'individu i : par défaut l'ensemble
 #             des ces enfants, ou seulement les enfants encore en vie (option="vivants")
 nb_enf <- function(i,t,option="tous")
 {
@@ -148,9 +147,8 @@ nb_enf <- function(i,t,option="tous")
   return (nb_enf)
 }
 
-#######################################################################################################
-# FONCTION DE TABULATION SUR VARIABLES DESTINIE
-
+# C) FONCTION DE TABULATION SUR VARIABLES DESTINIE------------
+#
 # -> Fonction "pyram"
 #
 # Retourne des efffectifs par age, avec filtrage optionnel. Le second parametre, egalement optionnel, est le 
@@ -176,7 +174,7 @@ pyram <- function(filtre=rep(TRUE,taille_max),pas=1)
 
 # -> function "by_age"
 # Calcul de differentes statistiques descriptives univariees pour une variable donnee, ventilees
-# par age avec un pas ajustable (pas=1 par defaut) et filtrage eventuel. Par defaut, la statisti-
+# par age avec un pas ajustable (pas=1 par defaut) et filtrage eventuel. Par défaut, la statisti-
 # que calculee est la moyenne (type="mean"). Les autres options possibles sont "min, "max", "median" 
 # et "sd".
 #
@@ -219,16 +217,16 @@ by_age <- function(var,t,filtre=rep(TRUE,taille_max),type="mean",pas=1)
 }
 
 
-########################################################################################################
-# D) ENTREES-SORTIES
+# D) ENTREES-SORTIES------------------
   
 # -> Fonction read_ap
 #
-# Lecture d'un tableau de donn?es par age et periode dans le fichier dont le nom est pass? en premier
-# argument. Le r?sultat est sous forme de matrice dont le premier indice est la p?riode et le second
-# est l'age, e.g. quotient_mortalite[t,a]. La m?me fonction peut ?videmment servir ? lire un tableau 
-# par g?n?ration et age, ?? charge pour l'utilisateur de l'utiliser ensuite de mani?re ad?quate. Un 
-# second param?tre permet de sp?cifier si l'age se lit en ligne ou en colonne dans le fichier d'origine
+# Lecture d'un tableau de donnees par age et periode dans le fichier dont le nom est passe en premier
+# argument. Le resultat est sous forme de matrice dont le premier indice est la periode et le second
+# est l'age, e.g. quotient_mortalite[t,a]. La meme fonction peut evidemment servir a lire un tableau 
+# par generation et age, a charge pour l'utilisateur de l'utiliser ensuite de maniere adequate. Un 
+# second parametre permet de specifier si l'age se lit en ligne ou en colonne dans le fichier d'origine
+
 read_ap <- function (fichier="",age="ligne")
 {  
   buf <- read.table(fichier,sep=";")
@@ -266,16 +264,17 @@ read_ap <- function (fichier="",age="ligne")
 }
 
 
-### Graphiques
+# E) GRAPHIQUES ---------
 
 # Graph_compar (DB): comparaison de series temporelles
 graph_compar <- function (serie,t1,t2,titre)
 {
   plot   (seq(1900+t1,1900+t2,by=1),serie[1,t1:t2],xlab="Annee", ylab=titre,
           ylim=c(min(serie[,t1:t2],na.rm=TRUE),max(serie[,t1:t2],na.rm=TRUE)),lwd=2,col="orange",type="l")
-  points (seq(1900+t1,1900+t2,by=1),serie[2,t1:t2],lwd=3,type="l")
-  points (seq(1900+t1,1900+t2,by=1),serie[3,t1:t2],lwd=1,type="l")
+  points (seq(1900+t1,1900+t2,by=1),serie[2,t1:t2],lwd=4,type="l")
+  points (seq(1900+t1,1900+t2,by=1),serie[3,t1:t2],lwd=3,type="l")
   points (seq(1900+t1,1900+t2,by=1),serie[4,t1:t2],lwd=2,type="l")
+
 }
 
  

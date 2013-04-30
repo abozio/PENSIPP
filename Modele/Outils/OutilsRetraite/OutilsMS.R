@@ -1,32 +1,28 @@
 ####################F###################################################################################
-#                                       BibliothËque OutilsMS.R
+#                                       Bibliotheque OutilsMS
 #
-# Reunit diffÈrents programmes applicables ‡ la microsimulation.
-# On suppose qu'on travaille sur une (ou des) populations (chacune) dÈcrite(s) par un ensemble de
-# variables stockÈes sous forme de vecteurs colonnes. La taille d'une population est la longueur 
-# commune ‡ l'ensemble de vecteurs qui la dÈcrivent.
+# Reunit differents programmes applicables a la microsimulation.
+# On suppose qu'on travaille sur une (ou des) populations (chacune) decrite(s) par un ensemble de
+# variables stockees sous forme de vecteurs colonnes. La taille d'une population est la longueur 
+# commune a l'ensemble de vecteurs qui la decrivent.
 #
-# Les fonctions proposÈes sont :
+# Les fonctions proposees sont :
 # A) Quelques utilitaires de base
-# B) Des fonctions de crÈation et manipulation de listes d'identifiants tirÈs au sein de ces 
+# B) Des fonctions de creation et manipulation de listes d'identifiants tires au sein de ces 
 #    populations 
 #
 ########################################################################################################
 
+# A) UTILITAIRES DE BASE-------------
 
-# A) UTILITAIRES DE BASE
-#########################
-
-# -> Taux de sondage par dÈfaut
+# -> Taux de sondage par d√©faut
 taux_sondage <- 1/10000
 
 
-# -> Fonction minmax:
-#    Applique simultanÈment un plancher et un plafond ‡ une variable, i.e. retourne plancher si elle
-#    lui est infÈrieure, plafond si elle lui est supÈrieure, et la laisse inchangÈe sinon. Le dernier
-#    argument, optionnel, est une liste d'indices pour lesquels appliquer l'opÈration. Dans ce cas, la
-#    valeur est ‡ zero pour les autres points.
-
+# -> Applique simultan√©ment un plancher et un plafond √† une variable, i.e. retourne plancher si elle
+#    lui est inf√©rieure, plafond si elle lui est sup√©rieure, et la laisse inchang√©e sinon. Le dernier
+#    argument, optionnel, est une liste d'indices pour lesquels appliquer l'op√©ration. Dans ce cas, la
+#    valeur est a zero pour les autres points
 minmax <- function(x,plancher,plafond,liste=c())
 {
   y <- rep(0,length(x)) 
@@ -37,15 +33,12 @@ minmax <- function(x,plancher,plafond,liste=c())
   return (y)
 }  
 
-# -> Fonction part:
-# Tronque les valeurs d'un vecteur ‡ la partie comprise entre des valeurs plancher et plafond, avec 
-# la mÍme possibilitÈ de filtrage que pour la fonction minmax.
-#
+# -> Tronque les valeurs d'un vecteur √† la partie comprise entre des valeurs plancher et plafond, avec 
+#    la m??me possibilit√© de filtrage que pour la fonction minmax
 # Exemple d'appel : 
 # 
 #    sal_tr2 <- part(salaire,PlafondSS,2*PlafondSS,which(statut=cadre))
 #
-
 part <- function(x,plancher,plafond,liste=c(1:length(x)))     #MODIF#25/09/12
 {
   y <- rep(0,length(x)) 
@@ -55,7 +48,7 @@ part <- function(x,plancher,plafond,liste=c(1:length(x)))     #MODIF#25/09/12
   return (y)  
 }
 
-# -> Interpolation linÈaire
+# -> Interpolation lin√©aire
 # affn <- function (x,noeud,val)
 # {
 #   if (x<noeud[1])
@@ -89,7 +82,7 @@ affn <- function (x,noeud,val)
 }
 
 # -> Tirage multinomial d'une valeur parmi celles du tableau val, avec le jeu de probas prob
-# (plus adaptÈe que la la fonction  rmultinom de R)
+# (plus adapt√©e que la la fonction  rmultinom de R)
 # Exemple d'appel : statut <- rmult (10,c(CodeNC,CodeCad,CodeFPA,CodeFPS,CodeInd,CodCho),
 #                                       c(0.4,0.2,0.1,0.1,0.1,0.1))
 rmult <- function (n,val,prob)
@@ -113,14 +106,14 @@ rmult <- function (n,val,prob)
    return (x)
 }
 
-# -> Arrondi alÈatoire ‡ l'un des deux entiers les plus proches
+# -> Arrondi al√©atoire √† l'un des deux entiers les plus proches
 arr_alea <- function (x)
 {
   return (floor(x)+rbinom(1,1,x-floor(x)))
 }
 
-# -> Fonction inflate : convertit le rÈsultat d'un comptage sur Èchantillon en un chiffre en population 
-#    rÈelle
+# -> Fonction inflate : convertit le r√©sultat d'un comptage sur √©chantillon en un chiffre en population 
+#    r√©elle
 inflate <- function (x)
 {
   return (x/taux_sondage);
@@ -134,18 +127,17 @@ deflate <- function (x)
 }
 
 
-# B) MANIPULATION DE LISTES D'INDIVIDUS
-########################################
+# B) MANIPULATION DE LISTES D'INDIVIDUS-----------------
 
 # -> Fonction "tirage"
 #
-# Tirage d'un sous-Èchantillon selon un vecteur de probabilitÈs d'inclusion "proba" dont la taille n
-# correspond ‡ la taille de la population de dÈpart.
+# Tirage d'un sous √©chantillon selon un vecteur de probabilit√©s d'inclusion "proba" dont la taille
+# n correspond √† la taille de la population de d√©part.  
 #
 # Exemples d'appel 
 #   liste <- tirage(proba,cible="aucune"   )        # Tirage bernouillien (non contraint)
-#   liste <- tirage(proba,cible="sommeprob")        # Tirage contraint ‡ somme(proba) (dÈfaut)
-#   liste <- tirage(proba,cible=100)                # Tirage contraint ‡ valeur quelconque
+#   liste <- tirage(proba,cible="sommeprob")        # Tirage contraint √† somme(proba) (d√©faut)
+#   liste <- tirage(proba,cible=100)                # Tirage contraint a valeur quelconque
 
 tirage <- function (proba,cible="sommeprob") 
 {
@@ -244,8 +236,8 @@ return ( (b*aux/(1-aux))^(1/a))
 
 # -> Fonction "tri"
 #
-# Tri d'une liste d'identifiants selon valeurs d'une variable. Par dÈfaut le tri est par valeurs
-# croissantes mais on peut spÈcifier l'option type="decroissant'.
+# Tri d'une liste d'identifiants selon valeurs d'une variable. Par d√©faut le tri est par valeurs
+# croissantes mais on peut sp√©cifier l'option type="decroissant'.
 #
 # Exemples d'appel
 #   liste <- tri(liste, salaire)
@@ -269,7 +261,7 @@ tri <- function (liste,var,type="croissant")
 
 # -> fonction "permut"
 #
-# Permutation alÈatoire des ÈlÈments d'une liste
+# Permutation al√©atoire des √©l√©ments d'une liste
 # Exemple d'appel
 #
 #   liste <- permut(liste)
@@ -288,15 +280,15 @@ permut <- function (liste)
 }
 
 # -> fonction sel
-# SÈlectionne les ÈlÈments d'une liste ‡ ses premiers ÈlÈments ou aux ÈlÈments remplissant un
-# critËre donnÈ.
+# r√©duit une liste √† ses premiers √©l√©ments ou aux √©l√©ments remplissant un
+# crit√®re donn√©
 #
-# Exemples d'appel:
+# Exemples d'appel
 #
-#  liste <- sel(liste,10)       # SÈlectionne les 10 premiers ÈlÈments de la liste
-#  liste <- sel(liste,-10)      # Elimine les 10 premiers ÈlÈments de la liste
-#  liste <- sel(liste,keep=x>2) # Ne retient que les i tels que x[i]>2
-#  liste <- sel(liste,drop=x>2) # Elimine de la liste les ÈlÈments tels que x[i]>2
+#  liste <- sel(liste,10)       # r√©duit la liste √† ses 10 premiers √©l√©ments
+#  liste <- sel(liste,-10)      # r√©duit la liste en √©liminant ses 10 premiers √©l√©ments
+#  liste <- sel(liste,keep=x>2) # ne retient que les i tels que x[i]>2
+#  liste <- sel(liste,drop=x>2) # elimine de la liste les √©l√©ments tels que x[i]>2
 
 sel <- function(liste,n=0,keep=c(),drop=c())
 {

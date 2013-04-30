@@ -1,3 +1,9 @@
+#######################################################################################################
+#                                                                                                     #
+#     OutilsCN: Definition des fonctions propres aux comptes notionnels                               #
+#                                                                                                     #
+#######################################################################################################
+
 
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsMS.R")) )
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsPensIPP.R")) )

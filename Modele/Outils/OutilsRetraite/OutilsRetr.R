@@ -799,7 +799,7 @@ SimDir <- function(i,t,comportement="TP",cible=c())
     }
   }
   else if (AgeMin(i,t) && (statut[i,t]>0))   
-  {
+    {
     # Liquidation possible si l'individu n'a pas encore liquidé et a validé au moins une période.
     # RAJOUT D'UNE CONDITION DE DUREE CN>0 POUR EVITER LIQUIDATIONS BIDONS D'INDIVIDUS SANS AUCUN DROITS
     if (ageliq[i]==0 &&   (duree_tot>0 || (t>=AnneeDepartCN && duree_tot >0 && t-t_naiss[i]>=55)))   ############   

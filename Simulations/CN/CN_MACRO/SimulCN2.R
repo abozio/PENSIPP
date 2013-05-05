@@ -73,7 +73,7 @@ cibletaux<-numeric(taille_max)
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(2,3,4))
+for (sc in c(1,2,3,4))
   
 {
   
@@ -212,7 +212,7 @@ for (sc in c(2,3,4))
 graph_compar(RATIOPENS       ,110,159,"Ratio pension/PIB")
 graph_compar(RATIOFIN        ,110,159,"Ratio Financier")
 
-save.image(paste0(cheminsource,"Simulations/CN/CN2.RData"))
+save.image(paste0(cheminsource,"Simulations/CN/CN_MACRO/CN2.RData"))
 
 # Graphique4
 par(mar=c(6.1, 3.1, 4.1, 2.1))
@@ -228,8 +228,8 @@ par(xpd=TRUE)
 plot   (seq(2010,2059,by=1),RATIOPENS[2,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.11,0.15),col="grey0",lwd=4,type="l")
 points (seq(2010,2059,by=1),RATIOPENS[3,110:159],lwd=4,col="grey40",type="l")
 points (seq(2010,2059,by=1),RATIOPENS[4,110:159],lwd=4,col="grey80",type="l")
-title("Graphe 3 : Régime CN \nEvolution du ratio retraite/PIB \nVariantes de scénario de croissance", cex.main = 0.9)
+title("Graphe 4.5 : Régime CN \nEvolution du ratio retraite/PIB \nVariantes de scénario de croissance", cex.main = 0.9)
 legend.text<-c("Scenario A (g=2%)","Scenario B (g=1.5%)","Scenario C (g=1%)")
-legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey80","grey0","grey40"))
+legend("bottom",inset=c(-0.2,-0.75),cex=0.8,legend.text, fill=c("grey80","grey0","grey40"))
 
 

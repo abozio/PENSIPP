@@ -110,9 +110,6 @@ title("Graphe : Evolution des dépenses ANC \n(stock, en milliards)", cex.main =
 legend.text<-c("Scenario de référence","Scenario CN")
 legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80"))
 
-plot(mtot[115:159])
-points(mtot_cn[115:159])
-
 
 
 # II.  PENSIONS A LIQUIDATION
@@ -201,7 +198,10 @@ par(mar=c(6.1, 3.1, 4.1, 2.1))
 par(xpd=TRUE)
 plot   (seq(2000,2059,by=1),mtotliqMDA[100:159],xlab="Annee", ylab="Masse stock ANC",ylim=c(0,4),col="grey0",lwd=4,type="l")
 points (seq(2000,2059,by=1),mtotliqMDA_cn[100:159],lwd=4,col="grey80",type="l")
-title("Graphe : Evolution des dépenses ANC \n(flux de liquidants, en milliards)", cex.main = 0.9)
+title("Graphe : Evolution des dépenses MDA\n(flux de liquidants, en milliards)", cex.main = 0.9)
 legend.text<-c("Scenario de référence","Scenario CN")
 legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80"))
 
+save.image( paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC.RData"))
+mtotliqMDA[150:159]-mtotliqMDA_cn[150:159]
+df[150:159]-dfCN[150:159]

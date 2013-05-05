@@ -119,10 +119,10 @@ PointsCN <- function(i,t,plafond)
   if (a==(AnneeDepartCN+1)) 
   {
 #  print (c("a",i,a,points_cn_pri))
-  points_cn_pri <<- points_cn_pri*0.9
-  points_cn_ind <<- points_cn_ind*0.9
-  points_cn_fp  <<- points_cn_fp*0.9
-  points_cn_nc  <<- points_cn_nc*0.9
+  points_cn_pri <<- points_cn_pri*0.95
+  points_cn_ind <<- points_cn_ind*0.95
+  points_cn_fp  <<- points_cn_fp*0.95
+  points_cn_nc  <<- points_cn_nc*0.95
 #  print (c("b",i,a,points_cn_pri))  
   
   }

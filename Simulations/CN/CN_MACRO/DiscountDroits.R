@@ -237,7 +237,7 @@ par(xpd=TRUE)
 plot   (seq(2010,2059,by=1),RATIOPENS[1,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.10,0.15),col="grey0",lwd=4,type="l")
 points (seq(2010,2059,by=1),RATIOPENS[2,110:159],lwd=4,col="grey80",type="l")
 points (seq(2010,2059,by=1),RATIOPENS[3,110:159],lwd=4,col="grey40",type="l")
-title("Graphe 6 : Evolution du ratio retraites/PIB \n", cex.main = 0.9)
+title("Graphe 6 : Evolution du ratio retraites/PIB \n(taux 25.8%, no ANC)", cex.main = 0.9)
 legend.text <- c("Scénario de référénce","CN","CN réduction droits acquis")
 legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80","grey40"))
 

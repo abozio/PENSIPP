@@ -27,6 +27,8 @@ pliq_fp       <- matrix(nrow=taille_max,ncol=7)
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
+actifsa      <- numeric(taille_max)        # Filtre population active
+retraitesa   <- numeric(taille_max)  
 liquidants  <- numeric(taille_max)
 liquidants_fp <- numeric(taille_max)
 liquidants_rg <- numeric(taille_max)
@@ -40,13 +42,15 @@ mg <-      numeric(taille_max)
 
 MSAL        <- matrix(nrow=7,ncol=200)    # Masse salariale par année
 MPENS       <- matrix(nrow=7,ncol=200)    # Masse des pensions année
+MPENSa       <- matrix(nrow=7,ncol=200)    # Masse des pensions année
 RATIOFIN    <- matrix(nrow=7,ncol=200)    # Ratio masse des pensions/masse des salaires par année
 SALMOY      <- matrix(nrow=7,ncol=200)    # Salaire moyen par année
 PENMOY      <- matrix(nrow=7,ncol=200)    # Pension moyenne par année
 PENREL      <- matrix(nrow=7,ncol=200)    # Ratio pension/salaire
 PENLIQMOY   <- matrix(nrow=7,ncol=200)    # Pension moyenne à liquidation
+PENLIQMOY  <- matrix(nrow=7,ncol=200)    # Pension moyenne à liquidation
 MPENLIQ     <- matrix(nrow=7,ncol=200)    # Masse des pension à liquidation
-
+MPENLIQa     <- matrix(nrow=7,ncol=200)    # Masse des pension à liquidation
 W           <- 2047.501
 cibletaux<-numeric(taille_max)
 cot<-numeric(taille_max)
@@ -62,9 +66,7 @@ for (sc in c(1,2,3,4,5,6,7))
   #  2-4: Neutralisation Avantages familiaux (MDA, bonif, AVPF)  
   #  5-6: Neutralisation Periodes assimilés & Pts gratuits  
   #  7: Neutralisation Minima de pensions
-  
 {
-  
   # Reinitialisation variables
   source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R")) )
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
@@ -105,8 +107,7 @@ for (sc in c(1,2,3,4,5,6,7))
           UseLeg(t,t_naiss[i])
           SimDir(i,t,"exo",ageref)
         }
-        else
-          
+        else          
         {
           UseLeg(t,t_naiss[i])
           SimDir(i,t,"TP")
@@ -117,6 +118,7 @@ for (sc in c(1,2,3,4,5,6,7))
           pliq_[i,sc] <- pension[i]
           pliq_rg[i,sc] <- pension_rg[i]
           pliq_fp[i,sc] <- pension_fp[i]
+          
           if (sc==1) 
           {
             ageref[i] <- t-t_naiss[i]
@@ -135,7 +137,7 @@ for (sc in c(1,2,3,4,5,6,7))
       
     } # Fin de la boucle individuelle 
     
-    if (sc ==1)
+    if (sc==1)
     {
       liquidants     <- which(t_liq>=105 & t_liq <= 150)
       liquidants_rg  <- which(t_liq>=105 & t_liq <= 150 & pension_rg>0 & pension_fp==0 & pension_in==0)
@@ -147,14 +149,19 @@ for (sc in c(1,2,3,4,5,6,7))
     
     actifs     <- (salaire[,t]>0) & (statut[,t]>0)
     retraites  <- (pension>0) & (statut[,t]>0)
+    actifsa     <- (salaire[1:10000,t]>0) & (statut[1:10000,t]>0)
+    retraitesa  <- (pension[1:10000]>0) & (statut[1:10000,t]>0)
     if (sc >0)
     {
       SALMOY[sc,t]       <- mean (salaire[actifs,t]/Prix[t])
       MPENS[sc,t]        <- W*sum(pension[retraites])/Prix[t] 
+      MPENSa[sc,t]        <- W*sum(pension[retraitesa])/Prix[t]
       MPENLIQ[sc,t]      <- W*sum(pension[which( (pension[]>0)&t_liq[]==t)])/Prix[t]  
+      MPENLIQa[sc,t]      <- W*sum(pension[which( (pension[1:10000]>0)&t_liq[1:10000]==t)])/Prix[t]
       MSAL[sc,t]         <- W*sum(salaire[actifs,t])/Prix[t] 
       RATIOFIN[sc,t]     <- MPENS[sc,t]/MSAL[sc,t]
       PENMOY[sc,t]       <- mean (pension[retraites]/Prix[t])
+      PENLIQMOY[sc,t]    <- mean (pension[which( (pension[]>0)&t_liq[]==t)])
       PENLIQMOY[sc,t]    <- mean (pension[which( (pension[]>0)&t_liq[]==t)])
       PENREL[sc,t]       <- PENMOY[sc,t]/SALMOY[sc,t]
     }  
@@ -172,7 +179,7 @@ for (sc in c(1,2,3,4,5,6,7))
 #graph_compar(MPENLIQ      ,115,159,"Ratio pension/salaire")
 par(mar=c(6.1, 3.1, 4.1, 2.1))
 par(xpd=TRUE)
-plot   (seq(2010,2059,by=1),RATIOFIN[1,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.20,0.30),col="grey0",lwd=4,type="l")
+plot   (seq(2010,2059,by=1),RATIO[1,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.20,0.30),col="grey0",lwd=4,type="l")
 points (seq(2010,2059,by=1),RATIOFIN[7,110:159],lwd=4,col="grey80",type="l")
 title("Graphe : Evolution du ratio retraites/PIB \n Comparaison Système actuel avec ou sans ANC", cex.main = 0.9)
 legend.text <- c("ANC","NO ANC")
@@ -180,6 +187,6 @@ legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey0","grey80"
 
 
 
-save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC.RData"))
-save(MPENS,MPENLIQ,RATIOFIN,file=paste0(cheminsource,"Simulations/CN/Dispositifs NC/MasseANC.RData"))
+save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC2.RData"))
+#save(MPENS,MPENLIQ,RATIOFIN,file=paste0(cheminsource,"Simulations/CN/Dispositifs NC/MasseANC.RData"))
 

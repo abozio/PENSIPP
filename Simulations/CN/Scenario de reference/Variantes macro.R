@@ -5,7 +5,7 @@
 t0  <- Sys.time()
   
 #### Chargement des programmes source ####
-  
+rm(list = ls())
 # D?claration du chemin pour les fichiers sources
 cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsMS.R"           )) )
@@ -157,9 +157,27 @@ graph_compar(AGELIQgenH  , 20, 80,"Age moyen de liquidation par génération - H
 graph_compar(AGELIQgenF  , 20, 80,"Age moyen de liquidation par génération - Femmes")
  
 save.image(paste0(cheminsource,"Simulations/CN/Scenario de reference/VariantesMacro.RData"))
+
 par(mar=c(3.1, 3.1, 4.1, 2.1))
 par(xpd=TRUE)
 graph_compar(RATIOPENS   ,110,159,"Ratio pension/PIB")
 title("Graphe 2 : Evolution du ratio retraite/PIB \nVariantes de scénario de croissance")
 legend.text<-c("Scenario B" ,"Scenario A" ,"Scenario C")
 legend("topleft",cex=0.9, legend.text,fill=c("grey0","grey40","grey80"))
+
+RATIOPENSM   <- matrix(nrow=3,ncol=200)   
+for (t in 110:159){RATIOPENSM[,t]<-(RATIOPENS[,(t-1)]+RATIOPENS[,(t)]+RATIOPENS[,(t+1)])/3}
+graph_compar(RATIOPENSM   ,110,159,"Ratio pension/PIB")
+title("Graphe 2 : Evolution du ratio retraite/PIB \nVariantes de scénario de croissance")
+legend.text<-c("Scenario B (g=1.5%)" ,"Scenario A" ,"Scenario C")
+legend("topleft",cex=0.9, legend.text,fill=c("grey0","grey40","grey80"))
+
+
+par(mar=c(6.1, 3.1, 4.1, 2.1))
+par(xpd=TRUE)
+plot   (seq(2010,2059,by=1),RATIOPENS[1,110:159],xlab="Annee", ylab="ratio retraite/PIB",ylim=c(0.11,0.16),col="grey0",lwd=4,type="l")
+points (seq(2010,2059,by=1),RATIOPENS[2,110:159],lwd=4,col="grey40",type="l")
+points (seq(2010,2059,by=1),RATIOPENS[3,110:159],lwd=4,col="grey80",type="l")
+title("Graphe 2.2 : Evolution du ratio retraite/PIB \nVariantes de scénario de croissance", cex.main = 0.9)
+legend.text<-c("Scenario A (g=2%)","Scenario B (g=1.5%)","Scenario C (g=1%)")
+legend("bottom",inset=c(-0.2,-0.55),cex=0.8,legend.text, fill=c("grey80","grey0","grey40"))

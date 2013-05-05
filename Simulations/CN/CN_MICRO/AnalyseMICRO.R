@@ -218,5 +218,3 @@ for (sc in c(1,2))
 #### Sorties ####
 
 save.image(paste0(cheminsource,"Simulations/CN/CN_MICRO/micro.RData"))
-
-

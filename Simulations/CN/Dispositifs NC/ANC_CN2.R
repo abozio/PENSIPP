@@ -54,7 +54,7 @@ cot<-numeric(taille_max)
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(2:7))
+for (sc in c(1):7)
 {
 #  1: Normal Ref  
 #  2: Normal CN
@@ -197,8 +197,8 @@ graph_compar(MPENLIQ[]      ,115,159,"")
 graph_compar(PENMOY[]      ,110,159,"")
 graph_compar(PENLIQMOY[]      ,110,159,"")
 
-save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_CN2.RData"))
-save(MPENS_CN,MPENLIQ_CN,RATIOFIN_CN,file=paste0(cheminsource,"Simulations/CN/Dispositifs NC/MasseANC_CN.RData"))
+#save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_CN2.RData"))
+#save(MPENS_CN,MPENLIQ_CN,RATIOFIN_CN,file=paste0(cheminsource,"Simulations/CN/Dispositifs NC/MasseANC_CN.RData"))
 
  
 # plot   (seq(1900+110,1900+159,by=1),MPENS[5,110:159],xlab="Annee", ylab="masse pension",

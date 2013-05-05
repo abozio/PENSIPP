@@ -31,6 +31,7 @@ TRC         <- numeric(taille_max)        # Taux de remplacemnt cible des liquid
 ageliq_     <- matrix(nrow=taille_max,ncol=4)
 duree_liq   <- numeric(taille_max)
 dar_        <- matrix(nrow=taille_max,ncol=4)
+pliq_    <- matrix(nrow=taille_max,ncol=4)
 pliq_rg     <- matrix(nrow=taille_max,ncol=4)
 points_cn   <- numeric(taille_max)
 pension_cn  <- numeric(taille_max)
@@ -72,7 +73,7 @@ cibletaux<-numeric(taille_max)
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(3,4))
+for (sc in c(1,2,3,4))
   
 {
   
@@ -94,7 +95,7 @@ for (sc in c(3,4))
     if (sc>1)
     {
       AnneeDepartCN <- 115
-      TauxCotCN[t]                 <- 0.27 #MPENS[1,115]/MSAL[1,115]
+      TauxCotCN[t]                 <- 0.258 #MPENS[1,115]/MSAL[1,115]
       if (t <110) {RendementCN[t]  <- PIB[t]/PIB[t-1]-1} 
       else        {RendementCN[t]  <- log((MSAL[sc,t-1]*Prix[t-1])/(MSAL[sc,t-6]*Prix[t-6]))/5}
       RendementCNPrev[t]           <- RendementCN[t]
@@ -140,6 +141,7 @@ for (sc in c(3,4))
         
         if (t_liq[i]==t)
         {
+          pliq_[i,sc]   <- pension[i]
           points_cn[i]  <- points_cn_pri+points_cn_fp+points_cn_ind
           pension_cn[i] <- pension_cn_pri[i]+pension_cn_fp[i]+pension_cn_ind[i]
           pliq_rg[i,sc] <- pension_rg[i]
@@ -213,8 +215,7 @@ for (sc in c(3,4))
 graph_compar(RATIOPENS       ,110,159,"Ratio pension/PIB")
 graph_compar(RATIOFIN        ,110,159,"Ratio Financier")
 
-save.image(paste0(cheminsource,"Simulations/CN/CN1.RData"))
-setwd(paste0(cheminsource,"Simulations/CN")) 
+save.image(paste0(cheminsource,"Simulations/CN/CN_MACRO/CN1.RData"))
 
 # Graphique3
 par(mar=c(6.1, 3.1, 4.1, 2.1))

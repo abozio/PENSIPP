@@ -67,7 +67,7 @@ for (sc in c(1,2,3,4,5,6,7)) #c(1,2,3,4,5,6,7)
   # Reinitialisation variables
   source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R")) )
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
-  setwd ( (paste0(cheminsource,"Simulations/CN"                                    )) )
+
 
   #   if (sc==2) {UseOptCN(c("valocot"))}
 #   if (sc==3) {UseOptCN(c("valocot","nobonifcn"))}
@@ -195,14 +195,13 @@ pliq_CN   <- pliq_[,2:7]
 MPENS_CN  <- MPENS[2:7,]
 PENREL_CN <- PENREL[2:7,]
 MPENLIQ_CN <- MPENLIQ[2:7,]
-RATIOPENS_CN<-
 
 #### Sorties ####
 graph_compar(MPENS[2:7,]     ,115,159,"Masse des pensions ")
 graph_compar(PENREL[2:7,]     ,115,159,"Ratio pension/salaire")
 graph_compar(MPENLIQ[2:7]      ,115,159,"")
 
-save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_CN2.RData"))
+save.image(paste0(cheminsource,"Simulations/CN/Dispositifs NC/ANC_CN.RData"))
  
 # plot   (seq(1900+110,1900+159,by=1),MPENS[5,110:159],xlab="Annee", ylab="masse pension",
 #         ylim=c(min(MPENS[5,110:159],na.rm=TRUE),max(MPENS[5,110:159],na.rm=TRUE)),lwd=2,col="orange",type="l")

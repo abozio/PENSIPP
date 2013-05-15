@@ -95,9 +95,7 @@ for (sc in c(2))
         if (t_liq[i]==t)
         { 
           pliq_[i,sc]          <- pension[i]
-          points_nc[i,sc]      <- points_cn_nc
           points_pri[i,sc]     <- points_cn_pri
-          pension_nc_liq[i,sc] <- pension_cn_nc[i]
           if (sc==1) {ageref[i]<- t-t_naiss[i]}
         }
       } 
@@ -145,10 +143,12 @@ graph_compar(MPENLIQ[]      ,115,159,"")
 graph_compar(PENMOY[]      ,110,159,"")
 graph_compar(PENLIQMOY[]      ,110,159,"")
 
+
+plot   (seq(1900+110,1900+159,by=1), PENMOY[2,110:159],xlab="Annee", ylab="pension moyenne",
+         ylim=c(10000,35000),lwd=2,col="black",type="l")
+         
+         
  
-plot   (seq(1900+110,1900+159,by=1),MPENS[1,110:159],xlab="Annee", ylab="masse pension",
-         ylim=c(min(MPENS[1,110:159],na.rm=TRUE),max(MPENS[1,110:159],na.rm=TRUE)),lwd=2,col="orange",type="l")
- points (seq(1900+110,1900+159,by=1),MPENS[2,110:159],lwd=4,type="l")
 
 
 

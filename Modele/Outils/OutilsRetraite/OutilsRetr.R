@@ -240,7 +240,40 @@ SalBase <- function(i,t)
   #MODIFSR#
 }
 
-# -> Fonction Points
+
+#### Fonction SalRefUniq
+# Calcul un salaire de référence unique pour toutes les années travaillées. 
+
+SalRefUniq <- function(i,t)
+{
+  # Choix du nombre d'année pour le calcul du salaire de réf
+  DureeCalc<-25
+  
+  spc      <- numeric(t_fin)
+  revalcum <- 1
+  u        <- t
+  while (u > t_naiss[i]+15)
+  {    
+    spc[u]      <- revalcum*min(PlafondSS[u],salaire[i,u])
+    if  ( (statut[i,u]==avpf) && (!(is.element("noavpf",Options))) )
+    {
+      spc[u] <- SMIC[u]*revalcum
+    }
+    revalcum    <- revalcum*RevaloSPC[u]
+    #    print (c(revalcum,PlafondSS[u],salaire[i,u],salreval[u],revalcum*min(PlafondSS[u],salaire[i,u])))
+    u           <- u-1   
+  }
+  
+  annees_act<- which(is.element(statut[i,1:t],c(non_cadre,cadre,avpf,indep,fonct_a,fonct_s)))
+  
+  if (length(annees_act)>0) {sal_ref <<- mean(sort(spc[annees_act],decreasing=TRUE)[1:min(DureeCalc,length(annees_act))])}
+  else (sal_ref<<-0)
+  #print(c(i,sal_ref))
+}
+
+
+
+##### Fonction Points
 # Calcule les points ARRCO et AGIRC acquis par l'individu i ?? la date t. Les variables
 # globales mises ?? jour sont points_arrco et points_agirc
 Points <- function(i,t)
@@ -603,7 +636,7 @@ Liq <- function(i,t)
      {  
 
     pension_ar[i] <<- pension_ar[i]*1.05
-    pension_ag[i] <<- pension_ag[i]*1.08+0.04*(n_enf[i]-3)
+    pension_ag[i] <<- pension_ag[i]*(1.08+0.04*(n_enf[i]-3))
       }
      else 
      {  
@@ -752,8 +785,6 @@ Revalo <- function(i,t1,t2)
   rev_ar[i]     <<- rev_ar[i]    *ValPtARRCO[t2]/ValPtARRCO[t1]
   pension_ag[i] <<- pension_ag[i]*ValPtAGIRC[t2]/ValPtAGIRC[t1]
   rev_ag[i]     <<- rev_ag[i]    *ValPtAGIRC[t2]/ValPtAGIRC[t1]
-
-
   
   # Mises a jour globales
   pension[i]  <<- pension_rg[i]+pension_ar[i]+pension_ag[i]+

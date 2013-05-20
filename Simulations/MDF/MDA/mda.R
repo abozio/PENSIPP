@@ -2,11 +2,13 @@
 
 # Masse des pensions pour chaque dispositif. 
 # Neutralisation tour à tour de chaque dispositif. 
+# Réforme: choix donnée entre une majoration et MDA classique. 
+# Majoration: 5% par enfants.
 
 t0  <- Sys.time()
 
 #### Chargement des programmes source ####
-
+rm(list = ls())
 # Déclaration du chemin pour les fichiers sources
 cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
 source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/OutilsMS.R"           )) )
@@ -23,17 +25,20 @@ ageref      <- numeric(taille_max)
 pliq_       <- matrix(nrow=taille_max,ncol=7)
 pliq_rg       <- matrix(nrow=taille_max,ncol=7)
 pliq_fp       <- matrix(nrow=taille_max,ncol=7)
+pliq_in       <- matrix(nrow=taille_max,ncol=7)
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
-actifsa      <- numeric(taille_max)        # Filtre population active
-retraitesa   <- numeric(taille_max)  
 liquidants  <- numeric(taille_max)
 liquidants_fp <- numeric(taille_max)
 liquidants_rg <- numeric(taille_max)
 liquidants_in <- numeric(taille_max)
 liquidants_po <- numeric(taille_max)
-pens    <- matrix(nrow=taille_max,ncol=200)
+# Sauvegarde des série de pensions par individus par année par scénario.
+pens1    <- matrix(nrow=taille_max,ncol=200)
+pens2    <- matrix(nrow=taille_max,ncol=200)
+pens3    <- matrix(nrow=taille_max,ncol=200)
+
 
 
 MSAL        <- matrix(nrow=7,ncol=200)    # Masse salariale par année
@@ -48,33 +53,37 @@ PENLIQMOY  <- matrix(nrow=7,ncol=200)    # Pension moyenne à liquidation
 MPENLIQ     <- matrix(nrow=7,ncol=200)    # Masse des pension à liquidation
 MPENLIQa     <- matrix(nrow=7,ncol=200)    # Masse des pension à liquidation
 W           <- 2047.501
-cibletaux<-numeric(taille_max)
-cot<-numeric(taille_max)
 
+# indicatrice si choix de la majoration plutot que la MDA classique. 
+choixMDA<-numeric(taille_max)
+pension_rg2<- numeric(taille_max)
+pension_fp2<- numeric(taille_max)
+pension_in2<- numeric(taille_max)
 
 
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(1,2))
+for (sc in c(1,2,3))
   #  1: Normal Ref  
-  #  2: No bonif
-  #  3: No MDA
-  #  4: No AVPF
-  #  5: Neutralisation touts Avantages familiaux (MDA, bonif, AVPF)  
+  #  2: No MDA
+  #  3: Réforme MDA
 
 {
   # Reinitialisation variables
   source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R")) )
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
-  setwd ( (paste0(cheminsource,"Simulations/MDF"                                    )) )
+  setwd ( (paste0(cheminsource,"Simulations/MDF/MDA"                                    )) )
   
   if (sc==2) {UseOpt(c("nomda"  ))}
 
   
   for (t in 80:160)   # Début boucle temporelle
   {
-    print (c(sc,t))
+
+    print (c(sc,t,Options))
+    if (sc==2) { if(t==80) {UseOpt(c("nomda"))}}
+    if (sc==3) { if(t==113){UseOpt(c("nomda"))}}
     
     # Liquidations  
     for (i in 1:55000)       # Début boucle individuelle
@@ -85,7 +94,7 @@ for (sc in c(1,2))
       if ((t-t_naiss[i]>=55) && (ageliq[i]==0))
       {
         if (sc>1)
-        {        
+        { 
           UseLeg(t,t_naiss[i])
           SimDir(i,t,"exo",ageref)
         }
@@ -97,14 +106,50 @@ for (sc in c(1,2))
         
         if (t_liq[i]==t)
         {
+          # Réforme: MDA vs bonification, comparaison des deux et choix du plus élevé. 
+          if (sc==3 & t>=113) 
+          {
+            # Majoration des pensions de base
+            if (sexe[i]==2)
+            {
+            pension_rg2[i]<- pension_rg[i] *(1+ 0.05*n_enf[i])
+            pension_fp2[i]<- pension_fp[i] *(1+ 0.05*n_enf[i])
+            pension_in2[i]<- pension_in[i] *(1+ 0.05*n_enf[i])
+            }
+            # Nouveau montant de pension
+            pension[i]<-pension_rg2[i]+pension_ar[i]+pension_ag[i]+
+                        pension_fp2[i]+pension_in2[i]
+            # Si le nouveau niveau de pension est supérieur à la MDA classique, on 
+            # garde. Sinon, on reprend les valeurs pour le scénario avec MDA.   
+            if (pension[i]>pliq_[i,1])
+            {
+            pension_rg[i]<-pension_rg2[i]
+            pension_fp[i]<-pension_fp2[i]
+            pension_in[i]<-pension_in2[i]
+            choixMDA[i]<-1
+            }
+            else
+            {
+            pension[i]<-pliq_[i,1]  
+            pension_rg[i]<-pliq_rg[i,1]  
+            pension_fp[i]<-pliq_fp[i,1]  
+            pension_in[i]<-pliq_in[i,1]               
+            }  
+            
+          }
+          
           pliq_[i,sc]   <- pension[i]
           pliq_rg[i,sc] <- pension_rg[i]
           pliq_fp[i,sc] <- pension_fp[i]
+          pliq_in[i,sc] <- pension_in[i]
+        
           
           if (sc==1) 
           {
             ageref[i] <- t-t_naiss[i]
           }
+          
+
         }
       } 
       
@@ -141,7 +186,9 @@ for (sc in c(1,2))
       PENREL[sc,t]       <- PENMOY[sc,t]/SALMOY[sc,t]
     }  
     
-    pens[,t]<-pension[]
+    if (sc==1) {pens1[,t]<-pension[]}
+    if (sc==2) {pens2[,t]<-pension[]}
+    if (sc==3) {pens3[,t]<-pension[]}
   } # Fin de de la boucle temporelle
   
   
@@ -153,5 +200,5 @@ for (sc in c(1,2))
 #### Sorties ####
 
 
-save.image(paste0(cheminsource,"Simulations/MDF/MDA/mda.RData"))
+save.image(paste0(cheminsource,"Simulations/MDF/MDA/mda2.RData"))
 

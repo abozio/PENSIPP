@@ -6,7 +6,7 @@
 # Chargement des résultats: 
 rm(list = ls())
 cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
-load(paste0(cheminsource,"Simulations/MDF/MDA/mda.RData"))
+load(paste0(cheminsource,"Simulations/MDF/MDA/mda2.RData"))
 setwd ( (paste0(cheminsource,"Simulations/MDF/MDA")))            
 # 1. Masse des pensions: 
 mtotMDA      <- numeric(200)
@@ -16,6 +16,18 @@ mtotliqMDA[]  <-(MPENLIQ[1,]-MPENLIQ[2,])/1e9
 # Valeurs en 2004 et 2006: 
 mtotMDA[104]
 mtotMDA[106]
+# Evolution: 
+par(mar=c(5.1, 4.1, 3.1, 1.1))
+plot   (seq(2000,2050,by=1),mtotMDA[100:150],
+        xlab="Année", ylab="Masses MDA",ylim=c(0,30),
+        col="grey0",lwd=2,type="l",yaxs="i",xaxs="i",cex.axis=0.8)
+title("Masse des pensions versée au titre de la MDA \n(STOCK, en milliard)")
+par(mar=c(5.1, 4.1, 3.1, 1.1))
+plot   (seq(2000,2050,by=1),mtotliqMDA[100:150],
+        xlab="Année", ylab="Masses MDA",ylim=c(0,2),
+        col="grey0",lwd=2,type="l",yaxs="i",xaxs="i",cex.axis=0.8)
+title("Masse des pensions versée au titre de la MDA \n(FLUX, en milliard)")
+
 
 # Pourcentage de bénéficiaire (au sens, % dont la pension est changé)
 length(which(t_liq<999 & sexe==2 & pliq_[,1]>pliq_[,2]))/length(which(t_liq<999 & sexe==2))
@@ -50,8 +62,8 @@ legend("topleft",legend.text, fill=c("green1","green4","lightskyblue","blue","ro
 
 # Lissage
 gene<-seq(1930,1990,by=1)
-y1 <- lm (penliqmoy[1,30:90] ~ poly (gene, 4, raw=TRUE))
-y2 <- lm (penliqmoy[2,30:90] ~ poly (gene, 4, raw=TRUE))
+y1  <- lm (penliqmoy[1,30:90] ~ poly (gene, 4, raw=TRUE))
+y2  <- lm (penliqmoy[2,30:90] ~ poly (gene, 4, raw=TRUE))
 y1F <- lm (penliqmoyF[1,30:90]~ poly (gene, 4, raw=TRUE))
 y2F <- lm (penliqmoyF[2,30:90] ~ poly (gene, 4, raw=TRUE))
 y1H <- lm (penliqmoyH[1,30:90]~ poly (gene, 4, raw=TRUE))
@@ -135,6 +147,43 @@ legend("top",legend=c("Scénario de référence","No mda"),
         )
 
 
+# 4. Déterminants des gains MDA. 
+# Regression gains MDA sur : salaire de référence, durée de cotisation, nb enfant. 
+list <- which(t_liq<999 & pliq_[,1]>pliq_[,2])
+gains<-numeric(taille_max)
+gains_pct<-numeric(taille_max)
+duremp<-numeric(taille_max)
+durval<-numeric(taille_max)
+impMDA<-numeric(taille_max)
+salref<-numeric(taille_max)
+fp <- numeric(taille_max)
+UseOpt("")
+for (i in list)
+{
+DurBase(i,t_liq[i])  
+DurMajo(i,t_liq[i])
+duremp[i]<-duree_emp
+durval[i] <-duree_tot
+impMDA[i]  <- (duree_tot_maj-duree_tot)/duree_tot
+SalRefUniq(i,t_liq[i])
+salref[i] <- sal_ref   
+}
+
+fp[liquidants_fp]<-1
+gains[]<-pliq_[,1]-pliq_[,2]
+gains_pct[]<-(pliq_[,1]-pliq_[,2])/pliq_[,2]
+
+m1 <- lm(gains[list] ~ 
+          durval[list] + salref[list] + n_enf[list]  + fp[list] + t_naiss[list]
+
+        )
+summary(m1)
+
+m1 <- lm(gains_pct[list] ~ 
+           durval[list] + salref[list] + n_enf[list]  + fp[list] + t_naiss[list]
+         
+)
+summary(m1)
 
 
 ####### II. Analyse de la réforme proposée: ########
@@ -221,5 +270,22 @@ mean(gain1[list])
 mean(gain1[listH])
 mean(gain1[listF])
 mean(gain2[list])
+
+list <- which(pliq_[,1]>pliq_[,2] & t_liq>112)
+length(list)/length(which(sexe==2 & n_enf[]>0 & t_liq<999 & t_liq>112))
+
+mean(pliq_[list,1]-pliq_[list,2]) # gain moyen
+mean( (pliq_[list,1]-pliq_[list,2])/pliq_[list,2])  # gain %
+mean( (pliq_[list,1]-pliq_[list,2])/(pliq_[list,2]*n_enf[list]))  # gain % par enfant. 
+
+list2 <- which(pliq_[,3]>pliq_[,2] & t_liq>112)
+length(list2)/length(which(sexe==2 & n_enf[]>0 & t_liq<999 & t_liq>112))
+list<-setdiff(list2,i)
+mean(pliq_[list2,3]-pliq_[list2,2]) # gain moyen
+mean( (pliq_[list2,3]-pliq_[list2,2])/pliq_[list2,2])  # gain %
+mean( (pliq_[list2,3]-pliq_[list2,2])/(pliq_[list2,3]*n_enf[list2]))  # gain % par enfant. 
+
+mean( (pliq_[list,3]-pliq_[list,2])/pliq_[list,2])  # gain %
+mean( (pliq_[list,3]-pliq_[list,2])/(pliq_[list,2]*n_enf[list]))  # gain % par enfant. 
 
 

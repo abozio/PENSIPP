@@ -6,7 +6,7 @@
 # Chargement des résultats: 
 rm(list = ls())
 cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
-load(paste0(cheminsource,"Simulations/MDF/ANC.RData"))
+load(paste0(cheminsource,"Simulations/MDF/BONIFICATIONS/bonif3.RData"))
 
 # 1. Masse des pensions: 
 mtotMAJ       <- numeric(200)
@@ -16,6 +16,13 @@ mtotliqMAJ[]  <-(MPENLIQ[1,]-MPENLIQ[2,])/1e9
 # Valeurs en 2004 et 2006: 
 mtotMAJ[104]
 mtotMAJ[106]
+# Evolution: 
+par(mar=c(5.1, 4.1, 3.1, 1.1))
+plot   (seq(2000,2050,by=1),mtotliqMAJ[100:150],
+        xlab="Année", ylab="Masses MAJ",ylim=c(0,5),
+        col="grey0",lwd=2,type="l",yaxs="i",xaxs="i",cex.axis=0.8)
+title("Masse des pensions versée au titre des majorations de pension \n(en milliard)")
+
 
 # 2. Analyse des bénéficiaires du dispositif:  
 gains     <- numeric(taille_max)  # gain individuel au dispositif (valeur)

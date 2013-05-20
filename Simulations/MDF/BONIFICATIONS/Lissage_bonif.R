@@ -6,7 +6,7 @@ cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
 #1. Tous liquidants
 
 # Chargement des données: 
-load(paste0(cheminsource,"Simulations/MDF/quant1.RData"))
+load(paste0(cheminsource,"Simulations/MDF/BONIFICATIONS/quant1.RData"))
 
 # Création du data.frame: 
 gene<-(seq(1930,1970,by=1))

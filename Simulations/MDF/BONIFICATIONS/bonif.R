@@ -74,13 +74,13 @@ MPENLIQ     <- matrix(nrow=4,ncol=200)    # Masse des pension à liquidation
 W           <- 2047.501
 
 # MAJORATION FORFAITAIRE
-flat_majo     <- matrix(nrow=4,ncol=200) 
+flat_majo     <- matrix(0,nrow=4,ncol=200) 
 
 
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(1,2,3,4))
+for (sc in c(3,4))
   #  1: Normal Ref  
   #  2: No bonif
   #  3: Bonif forfaitaire indexé sur le taux de croissance des pensions
@@ -92,15 +92,13 @@ for (sc in c(1,2,3,4))
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
   setwd ( (paste0(cheminsource,"Simulations/MDF"                                    )) )
 
-if (sc==2){UseOpt("nobonif")}
 
   for (t in 80:160)   # Début boucle temporelle
   {
+    if (sc==2) {(if (t==80){UseOpt("nobonif")}}
+    if (sc>2) {(if (t==113){UseOpt("nobonif")}}
     
     # Majoration: 
-#list <- which(t_liq==113 & n_enf[]>2)
-#mean(pliq_[list,1]-pliq_[list,2]) 
-
     flat_majo[3:4,113]<-1662.712
     if (sc==3 & t>113)
     {
@@ -126,7 +124,6 @@ if (sc==2){UseOpt("nobonif")}
         if (sc>2)
         {   
           # Neutralisation des bonifications pour pensions après 2008
-          if (t==113){UseOpt("nobonif")}
           UseLeg(t,t_naiss[i])
           SimDir(i,t,"exo",ageref)
         }
@@ -157,10 +154,7 @@ if (sc==2){UseOpt("nobonif")}
           # Enregistrement des pensions à liquidation
           pliq_[i,sc]   <- pension[i]
           pliq_rg[i,sc] <- pension_rg[i]
-          pliq_fp[i,sc] <- pension_fp[i]
-          
-
-        
+          pliq_fp[i,sc] <- pension_fp[i]        
         }
         
       } 
@@ -168,6 +162,10 @@ if (sc==2){UseOpt("nobonif")}
       else if (ageliq[i]>0)
       { 
         Revalo(i,t,t+1)    
+        if (n_enf[i]>2 & t>=113)
+        {
+        pension[i]<-pension[i]+flat_majo[sc,t_liq[i]]
+        }
       }
       
     } # Fin de la boucle individuelle 
@@ -208,4 +206,4 @@ if (sc==2){UseOpt("nobonif")}
 
 #### Sorties ####
 
-save.image(paste0(cheminsource,"Simulations/MDF/bonif3.RData"))
+save.image(paste0(cheminsource,"Simulations/MDF/bonif.RData"))

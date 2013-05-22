@@ -23,6 +23,9 @@ ageref      <- numeric(taille_max)
 pliq_       <- matrix(nrow=taille_max,ncol=7)
 pliq_rg       <- matrix(nrow=taille_max,ncol=7)
 pliq_fp       <- matrix(nrow=taille_max,ncol=7)
+pens1    <- matrix(nrow=taille_max,ncol=200)
+pens2    <- matrix(nrow=taille_max,ncol=200)
+pens3    <- matrix(nrow=taille_max,ncol=200)
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
@@ -69,13 +72,12 @@ for (sc in c(1,2))
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
   setwd ( (paste0(cheminsource,"Simulations/MDF/AVPF"                                    )) )
   
-  if (sc==2) {UseOpt(c("noavpf"  ))}
-  
-  
+
   for (t in 80:160)   # Début boucle temporelle
   {
-    print (c(sc,t))
-    
+    print (c(sc,t,Options))
+    if (sc==2) { if(t==80) {UseOpt(c("noavpf"))}}
+    if (sc==3) { if(t==113){UseOpt(c("noavpf"))}}
     # Liquidations  
     for (i in 1:55000)       # Début boucle individuelle
     {
@@ -140,8 +142,9 @@ for (sc in c(1,2))
       PENLIQMOY[sc,t]    <- mean (pension[which( (pension[]>0)&t_liq[]==t)])
       PENREL[sc,t]       <- PENMOY[sc,t]/SALMOY[sc,t]
     }  
-    
-    pens[,t]<-pension[]
+    if (sc==1) {pens1[retraites,t]<-pension[retraites]/Prix[t]}
+    if (sc==2) {pens2[retraites,t]<-pension[retraites]/Prix[t]}
+    if (sc==3) {pens3[retraites,t]<-pension[retraites]/Prix[t]}
   } # Fin de de la boucle temporelle
   
   

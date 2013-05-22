@@ -50,7 +50,9 @@ ageref      <- numeric(taille_max)
 pliq_       <- matrix(nrow=taille_max,ncol=7)
 pliq_rg       <- matrix(nrow=taille_max,ncol=7)
 pliq_fp       <- matrix(nrow=taille_max,ncol=7)
-pens    <- matrix(nrow=taille_max,ncol=200)
+pens1    <- matrix(nrow=taille_max,ncol=200)
+pens2    <- matrix(nrow=taille_max,ncol=200)
+pens3    <- matrix(nrow=taille_max,ncol=200)
 gain        <- numeric(taille_max)
 actifs      <- numeric(taille_max)        # Filtre population active
 retraites   <- numeric(taille_max)        # Filtre population retraitée
@@ -80,7 +82,7 @@ flat_majo     <- matrix(0,nrow=4,ncol=200)
 #### Début de la simulation ####
 
 #  Rprof(tmp<-tempfile())
-for (sc in c(3,4))
+for (sc in c(1,2,3,4))
   #  1: Normal Ref  
   #  2: No bonif
   #  3: Bonif forfaitaire indexé sur le taux de croissance des pensions
@@ -90,13 +92,13 @@ for (sc in c(3,4))
   # Reinitialisation variables
   source( (paste0(cheminsource,"Modele/Outils/OutilsRetraite/DefVarRetr_Destinie.R")) )
   load  ( (paste0(cheminsource,"Modele/Outils/OutilsBio/BiosDestinie2.RData"        )) )  
-  setwd ( (paste0(cheminsource,"Simulations/MDF"                                    )) )
+  setwd ( (paste0(cheminsource,"Simulations/MDF/BONIFICATIONS"                                    )) )
 
 
   for (t in 80:160)   # Début boucle temporelle
   {
-    if (sc==2) {(if (t==80){UseOpt("nobonif")}}
-    if (sc>2) {(if (t==113){UseOpt("nobonif")}}
+    if (sc==2) { if(t==80) {UseOpt(c("nobonif"))}}
+    if (sc==3) { if(t==113){UseOpt(c("nobonif"))}}
     
     # Majoration: 
     flat_majo[3:4,113]<-1662.712
@@ -143,11 +145,13 @@ for (sc in c(3,4))
           }
           
           # Application de la majoration pour les parents de 3 enfants et plus. 
+          # Reversement au RG par hypothèse.
           if (sc>2) 
           {
             if (n_enf[i]>2 & t>=113)
             {
               pension[i]<-pension[i]+flat_majo[sc,t]
+              pension_rg[i]<-pension_rg[i]+flat_majo[sc,t]
             }  
           }
           
@@ -162,10 +166,10 @@ for (sc in c(3,4))
       else if (ageliq[i]>0)
       { 
         Revalo(i,t,t+1)    
-        if (n_enf[i]>2 & t>=113)
-        {
-        pension[i]<-pension[i]+flat_majo[sc,t_liq[i]]
-        }
+#         if (n_enf[i]>2 & t>=113)
+#         {
+#         pension[i]<-pension[i]+flat_majo[sc,t_liq[i]]
+#         }
       }
       
     } # Fin de la boucle individuelle 
@@ -195,7 +199,9 @@ for (sc in c(3,4))
       PENREL[sc,t]       <- PENMOY[sc,t]/SALMOY[sc,t]
     }  
     
-    pens[,t]<-pension[]
+    if (sc==1) {pens1[retraites,t]<-pension[retraites]/Prix[t]}
+    if (sc==2) {pens2[retraites,t]<-pension[retraites]/Prix[t]}
+    if (sc==3) {pens3[retraites,t]<-pension[retraites]/Prix[t]}
   } # Fin de de la boucle temporelle
   
   

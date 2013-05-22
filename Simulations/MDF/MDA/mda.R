@@ -35,9 +35,9 @@ liquidants_rg <- numeric(taille_max)
 liquidants_in <- numeric(taille_max)
 liquidants_po <- numeric(taille_max)
 # Sauvegarde des série de pensions par individus par année par scénario.
-pens1    <- matrix(nrow=taille_max,ncol=200)
-pens2    <- matrix(nrow=taille_max,ncol=200)
-pens3    <- matrix(nrow=taille_max,ncol=200)
+pens1    <- matrix(0,nrow=taille_max,ncol=200)
+pens2    <- matrix(0,nrow=taille_max,ncol=200)
+pens3    <- matrix(0,nrow=taille_max,ncol=200)
 
 
 
@@ -186,9 +186,9 @@ for (sc in c(1,2,3))
       PENREL[sc,t]       <- PENMOY[sc,t]/SALMOY[sc,t]
     }  
     
-    if (sc==1) {pens1[,t]<-pension[]}
-    if (sc==2) {pens2[,t]<-pension[]}
-    if (sc==3) {pens3[,t]<-pension[]}
+    if (sc==1) {pens1[retraites,t]<-pension[retraites]/Prix[t]}
+    if (sc==2) {pens2[retraites,t]<-pension[retraites]/Prix[t]}
+    if (sc==3) {pens3[retraites,t]<-pension[retraites]/Prix[t]}
   } # Fin de de la boucle temporelle
   
   
@@ -200,5 +200,5 @@ for (sc in c(1,2,3))
 #### Sorties ####
 
 
-save.image(paste0(cheminsource,"Simulations/MDF/MDA/mda2.RData"))
+#save.image(paste0(cheminsource,"Simulations/MDF/MDA/mda.RData"))
 

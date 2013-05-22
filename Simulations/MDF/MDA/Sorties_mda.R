@@ -6,8 +6,8 @@
 # Chargement des résultats: 
 rm(list = ls())
 cheminsource <- "/Users/simonrabate/Desktop/PENSIPP 0.1/"
-load(paste0(cheminsource,"Simulations/MDF/MDA/mda2.RData"))
-setwd ( (paste0(cheminsource,"Simulations/MDF/MDA")))            
+load(paste0(cheminsource,"Simulations/MDF/MDA/mda.RData"))
+setwd ( (paste0(cheminsource,"Simulations/MDF/MDA/Graphes")))            
 # 1. Masse des pensions: 
 mtotMDA      <- numeric(200)
 mtotliqMDA    <- numeric(200)
@@ -22,7 +22,29 @@ plot   (seq(2000,2050,by=1),mtotMDA[100:150],
         xlab="Année", ylab="Masses MDA",ylim=c(0,30),
         col="grey0",lwd=2,type="l",yaxs="i",xaxs="i",cex.axis=0.8)
 title("Masse des pensions versée au titre de la MDA \n(STOCK, en milliard)")
+points(seq(2000,2050,by=1),(mtotMDA[100:150]*100/MPENS[1,100:150]),col="grey80")
 par(mar=c(5.1, 4.1, 3.1, 1.1))
+
+
+
+x<-(seq(2000,2050,by=1))
+par(mar=c(2.1, 4.1, 2.1, 4.1))
+plot(x,mtotMDA[100:150],type="l",col="grey0",xlab="",ylab="",
+     ylim=c(0,30),yaxs="i",xaxs="i",lwd=4)
+par(new=TRUE)
+plot(x,(mtotMDA[100:150]*1e9/MPENS[1,100:150]),type="l",col="grey80",xlab="",ylab="",yaxt="n",
+     ylim=c(0,0.15),yaxs="i",xaxs="i",lwd=4)
+#title("Pensions versées au titre des MDA par années \nEvolution par année", cex.main=0.8)
+par(new=TRUE)
+axis(4)
+mtext(side = 2, text = "Masse des pensions MDA (en milliards)", line = 2.5, cex=0.8)
+mtext(side = 4, text = "Ratio pensions MDA/ pension totale", line = 2.5, cex=0.8)
+legend.text<-c("masse MDA","ratio masse MDA/masse totale des pensions")
+legend("topleft",cex=0.8, legend.text, col=c("grey0", "grey80"),
+       lty=c(1,1,2,2),bty="n")
+
+
+
 plot   (seq(2000,2050,by=1),mtotliqMDA[100:150],
         xlab="Année", ylab="Masses MDA",ylim=c(0,2),
         col="grey0",lwd=2,type="l",yaxs="i",xaxs="i",cex.axis=0.8)
@@ -30,7 +52,39 @@ title("Masse des pensions versée au titre de la MDA \n(FLUX, en milliard)")
 
 
 # Pourcentage de bénéficiaire (au sens, % dont la pension est changé)
-length(which(t_liq<999 & sexe==2 & pliq_[,1]>pliq_[,2]))/length(which(t_liq<999 & sexe==2))
+# Evolution:
+benef<-numeric(200)
+benefH<-numeric(200)
+benefF<-numeric(200)
+for (g in 30:90)
+{
+  benef[g]<-length(which(t_liq<999  & t_naiss==g & pliq_[,1]>pliq_[,2]))/
+    length(which(t_liq<999 &t_naiss==g))
+  benefF[g]<-length(which(t_liq<999 & sexe==2 &t_naiss==g & pliq_[,1]>pliq_[,2]))/
+    length(which(t_liq<999 &t_naiss==g & sexe==2))
+  benefH[g]<-length(which(t_liq<999 & sexe==1 &t_naiss==g & pliq_[,1]>pliq_[,2]))/
+    length(which(t_liq<999 &t_naiss==g & sexe==1))
+}  
+
+#Lissage
+gene<-seq(1930,1990,by=1)
+y   <- lm (benef[30:90] ~ poly (gene, 4, raw=TRUE))
+yH  <- lm (benefH[30:90] ~ poly (gene, 4, raw=TRUE))
+yF  <- lm (benefF[30:90] ~ poly (gene, 4, raw=TRUE))
+
+par(mar = c(4.1, 4.1, 3.1, 2.1))
+plot(gene,fitted(yF), type="l",lwd=3,pch=16,
+     ylim=c(0,1),col="rosybrown1",
+     xlab="Année de naissance",ylab="Pourcentages de bénéficiaires")
+lines(gene,fitted(yH), lwd=3, col="lightskyblue")
+lines(gene,fitted(y), lwd=3, col="lightgreen")
+
+title(main= "Pourcentage de bénéficiaires des MDA\n Evolution par génération",cex.main=0.8)
+legend("top",legend=c("HF","H","F"),
+       lty=1,lwd=2,col=c("lightgreen","lightskyblue","rosybrown1"),
+       ncol=3,bty="n",cex=0.8,,
+)
+
 
 
 # 2. Effets sur les pensions  
@@ -69,19 +123,19 @@ y2F <- lm (penliqmoyF[2,30:90] ~ poly (gene, 4, raw=TRUE))
 y1H <- lm (penliqmoyH[1,30:90]~ poly (gene, 4, raw=TRUE))
 y2H <- lm (penliqmoyH[2,30:90] ~ poly (gene, 4, raw=TRUE))
 
-par(mar = c(4.1, 4.1, 4.1, 2.1))
+par(mar = c(4.1, 4.1, 3.1, 2.1))
 plot(gene,fitted(y1F), type="l",lwd=3,pch=16,
      ylim=c(10000,50000),col="rosybrown1",
      xlab="Année de naissance",ylab="Pension à liquidation")
 lines(gene,fitted(y2F), lwd=3, col="red1")
 lines(gene,fitted(y1H), lwd=3, col="lightskyblue")
 lines(gene,fitted(y2H), lwd=3, col="blue")
-lines(gene,fitted(y1), lwd=3, col="green1")
-lines(gene,fitted(y2), lwd=3, col="green4")
+lines(gene,fitted(y1), lwd=3, col="lightgreen")
+lines(gene,fitted(y2), lwd=3, col="green")
 
-title(main= "Pension à liquidation: Evolution par génération \n (tous liquidants)",cex=0.8)
+title(main= "Pension à liquidation: Evolution par génération \n (tous liquidants)",cex.main=0.8)
 legend("top",legend=c("HF","HF no mda","H","H no mda","F","F no mda"),
-       lty=1,lwd=2,col=c("green1","green4","lightskyblue","blue", "rosybrown1","red1"),
+       lty=1,lwd=2,col=c("lightgreen","green","lightskyblue","blue", "rosybrown1","red1"),
        ncol=3,bty="n",cex=0.8,,
 )
 
@@ -100,15 +154,15 @@ y1F <- lm (penliqmoyF2[1,30:90]~ poly (gene, 4, raw=TRUE))
 y2F <- lm (penliqmoyF2[2,30:90] ~ poly (gene, 4, raw=TRUE))
 
 
-par(mar = c(4.1, 4.1, 4.1, 2.1))
+par(mar = c(4.1, 4.1, 3.1, 2.1))
 plot(gene,fitted(y1F), type="l",lwd=3,pch=16,
-     ylim=c(10000,50000),col="rosybrown1",
+     ylim=c(0000,40000),col="rosybrown1",
      xlab="Année de naissance",ylab="Pension à liquidation")
 lines(gene,fitted(y2F), lwd=3, col="red1")
-title(main= "Pension à liquidation: Evolution par génération \n (bénéficiaires)",cex=0.8)
-legend("top",legend=c("F","F no mda"),
+title(main= "Pension à liquidation: Evolution par génération \n (bénéficiaires)",cex.main=0.8)
+legend("topleft",legend=c("F","F no mda"),
        lty=1,lwd=2,col=c("rosybrown1","red1"),
-       ncol=3,bty="n",cex=0.8,,
+       ncol=1,bty="n",cex=0.8,,
 )
 
 
@@ -135,19 +189,19 @@ y1 <- lm (ratio[1,30:90] ~ poly (gene, 4, raw=TRUE))
 y2 <- lm (ratio[2,30:90] ~ poly (gene, 4, raw=TRUE))
 
 
-par(mar = c(4.1, 4.1, 4.1, 2.1))
+par(mar = c(4.1, 4.1, 2.1, 2.1))
 plot(gene,fitted(y1), type="l",lwd=3,pch=16,
      ylim=c(0.5,1),col="grey0",
      xlab="Année de naissance",ylab="Pension Femme/ Pension homme")
 lines(gene,fitted(y2), lwd=3, col="grey80")
-title(main= "Pension à liquidation: rapport Femme/Homme",cex=0.8)
+#title(main= "Pension à liquidation: rapport Femme/Homme",cex.main=0.8)
 legend("top",legend=c("Scénario de référence","No mda"),
        lty=1,lwd=2,col=c("grey0","grey80"),
        ncol=1,bty="n",cex=0.8,,
         )
 
 
-# 4. Déterminants des gains MDA. 
+######## 4. Déterminants des gains MDA. ######
 # Regression gains MDA sur : salaire de référence, durée de cotisation, nb enfant. 
 list <- which(t_liq<999 & pliq_[,1]>pliq_[,2])
 gains<-numeric(taille_max)
@@ -171,7 +225,6 @@ salref[i] <- sal_ref
 
 fp[liquidants_fp]<-1
 gains[]<-pliq_[,1]-pliq_[,2]
-gains_pct[]<-(pliq_[,1]-pliq_[,2])/pliq_[,2]
 
 m1 <- lm(gains[list] ~ 
           durval[list] + salref[list] + n_enf[list]  + fp[list] + t_naiss[list]
@@ -179,11 +232,28 @@ m1 <- lm(gains[list] ~
         )
 summary(m1)
 
-m1 <- lm(gains_pct[list] ~ 
-           durval[list] + salref[list] + n_enf[list]  + fp[list] + t_naiss[list]
+# Demean
+Mgains <-numeric(taille_max)
+Msalref<-numeric(taille_max)
+Mdurval<-numeric(taille_max)
+Mn_enf<-numeric(taille_max)
+Mgains[list] <-gains[list]-mean(gains[list])
+Msalref[list]<-salref[list]-mean(salref[list])
+Mn_enf[list] <-n_enf[list]-mean(n_enf[list])
+Mdurval[list]<-durval[list]-mean(durval[list])
+
+m1 <- lm(Mgains[list] ~ 
+           Mdurval[list] + Msalref[list] + Mn_enf[list]  + fp[list] + t_naiss[list]
          
 )
 summary(m1)
+
+m1 <- lm(log(Mgains[list]) ~ 
+           Mdurval[list] + Msalref[list] + Mn_enf[list]  + fp[list] + t_naiss[list])
+         
+)
+summary(m1)
+
 
 
 ####### II. Analyse de la réforme proposée: ########

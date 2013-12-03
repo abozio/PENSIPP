@@ -291,8 +291,8 @@ RevaloCN        <- numeric(200)
 
 
 # Lecture des parametres simples
-setwd((paste0(cheminsource,"Modele/Parametres/Destinie/Parametres Sociaux")))
-buf <- read.csv2("ParamEco.csv",dec=".",sep=";",header=TRUE)
+chem_Param <- paste0(cheminsource,"Modele/Parametres/Destinie/Parametres Sociaux/")
+buf <- read.csv2(paste0(chem_Param,"ParamEco.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 Prix[t_min:t_max]            <- buf[1:nrow(buf),2]
@@ -302,7 +302,7 @@ PointFP[t_min:t_max]         <- buf[1:nrow(buf),5]
 SMPT[t_min:t_max]            <- buf[1:nrow(buf),6]
 PIB[t_min:t_max]             <- buf[1:nrow(buf),7]
 PIB[t_min:t_max]            <- PIB[t_min:t_max]*1000000000
-buf <- read.csv2("ParamRetBase.csv",dec=".",sep=";",header=TRUE)
+buf <- read.csv2(paste0(chem_Param,"ParamRetBase.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 RevaloSPC[t_min:t_max]       <- buf[1:nrow(buf),2]
@@ -320,7 +320,7 @@ Mincont2[t_min:t_max]        <- buf[1:nrow(buf),12]
 MinPR[t_min:t_max]           <- buf[1:nrow(buf),13]
 CoefMdaRG[t_min:t_max]       <- buf[1:nrow(buf),14]
 CoefMdaFP[t_min:t_max]       <- buf[1:nrow(buf),15]
-buf <- read.csv2("ParamRetComp.csv",dec=".",sep=";",header=TRUE)
+buf <- read.csv2(paste0(chem_Param,"ParamRetComp.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 TauxARRCO_1[t_min:t_max]     <- buf[1:nrow(buf),2]
@@ -338,7 +338,7 @@ TauxAppAGIRC[t_min:t_max]    <- buf[1:nrow(buf),13]
 SalRefAGIRC[t_min:t_max]     <- buf[1:nrow(buf),14]
 ValPtAGIRC[t_min:t_max]      <- buf[1:nrow(buf),15]
 GMP[t_min:t_max]             <- buf[1:nrow(buf),16]
-buf <- read.csv2("ParamRev.csv",dec=".",sep=";",header=TRUE)
+buf <- read.csv2(paste0(chem_Param,"ParamRev.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 TauxRevRG[t_min:t_max]       <- buf[1:nrow(buf),2]
@@ -349,14 +349,14 @@ TauxRevARRCO[t_min:t_max]    <- buf[1:nrow(buf),6]
 TauxRevAGIRC[t_min:t_max]    <- buf[1:nrow(buf),7]
 TauxRevFP[t_min:t_max]       <- buf[1:nrow(buf),8]
 TauxRevInd[t_min:t_max]      <- buf[1:nrow(buf),9]
-buf <- read.csv2("ParamPreret.csv",dec=".",sep=";",header=TRUE)
+buf <- read.csv2(paste0(chem_Param,"ParamPreret.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 TauxPR1[t_min:t_max]         <- buf[1:nrow(buf),2]
 TauxPR2[t_min:t_max]         <- buf[1:nrow(buf),3]
 TauxPR3[t_min:t_max]         <- buf[1:nrow(buf),4]
 AgeEligPR[t_min:t_max]       <- buf[1:nrow(buf),5]
-buf <- read.csv2("ParamFam.csv",dec=".",sep=";",header=TRUE)
+buf <- read.csv2(paste0(chem_Param,"ParamFam.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 BMAF[t_min:t_max]            <- buf[1:nrow(buf),2]
@@ -371,7 +371,7 @@ PlafARS2[t_min:t_max]        <- buf[1:nrow(buf),10]
 PlafARS3[t_min:t_max]        <- buf[1:nrow(buf),11]
 PlafARS4[t_min:t_max]        <- buf[1:nrow(buf),12]
 PlafARS5[t_min:t_max]        <- buf[1:nrow(buf),13]
-buf <- read.csv2("ParamAutres.csv",dec=".",sep=";",header=TRUE)
+buf <- read.csv2(paste0(chem_Param,"ParamAutres.csv"),dec=".",sep=";",header=TRUE)
 t_min <- buf[1,1]%%1900
 t_max <- buf[nrow(buf),1]%%1900
 TauxMalSP[t_min:t_max]       <- buf[1:nrow(buf),2]
